@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tv generator-info-name="MADAR fictional source export">
+  <channel id="news-en"><display-name>MADAR News</display-name></channel>
+  <channel id="culture-ar"><display-name>MADAR Culture</display-name></channel>
+  <programme id="news-20261103-1100" channel="news-en" start="20261103110000 +0400" stop="20261103113000 +0400">
+    <title lang="en">Morning News</title><title lang="ar">الأخبار الصباحية</title>
+    <desc>Headlines and local community updates.</desc><category>News</category>
+  </programme>
+  <programme id="news-20261103-1130" channel="news-en" start="20261103113000 +0400" stop="20261103120000 +0400">
+    <title lang="en">Community Today</title><category>Community</category>
+  </programme>
+  <programme id="culture-20261103-1100" channel="culture-ar" start="20261103110000 +0400" stop="20261103120000 +0400">
+    <title lang="en">Heritage Stories</title><title lang="ar">قصص التراث</title>
+    <desc>A fictional programme demonstrating bilingual guide metadata.</desc><category>Culture</category>
+  </programme>
+</tv>

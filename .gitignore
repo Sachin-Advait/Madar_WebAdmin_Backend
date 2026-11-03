@@ -1,0 +1,14 @@
+node_modules/
+data/
+.env
+*.log
+*.tsbuildinfo
+apps/admin/dist/
+.DS_Store
+apps/tv/.dart_tool/
+apps/tv/build/
+apps/tv/.flutter-plugins-dependencies
+apps/tv/android/local.properties
+apps/tv/android/.gradle/
+*.jks
+*.keystore

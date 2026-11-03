@@ -1,0 +1,25 @@
+{
+  "name": "madar-platform",
+  "version": "4.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/admin",
+    "services/api"
+  ],
+  "scripts": {
+    "dev": "node services/api/src/server.mjs",
+    "test": "node --test --test-concurrency=1 services/api/tests/*.test.mjs",
+    "typecheck": "npm run typecheck -w apps/admin",
+    "build": "npm run build -w apps/admin && node scripts/finalize-web-build.mjs",
+    "check": "npm test && npm run test:admin && npm run typecheck && npm run build",
+    "preview:offline": "node scripts/export-showcase.mjs && node scripts/build-offline-preview.mjs",
+    "test:redis": "node --test --test-concurrency=1 services/api/tests/redis-stream.integration.mjs",
+    "demo:tv": "node scripts/export-tv-demo.mjs",
+    "docs:api": "node scripts/export-openapi.mjs",
+    "test:admin": "node --test apps/admin/tests/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

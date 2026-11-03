@@ -1,0 +1,10 @@
+import {readFile,writeFile,readdir} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+const dist=new URL('../apps/admin/dist/',import.meta.url);
+const assets=(await readdir(new URL('assets/',dist))).map(f=>'/assets/'+f);
+let sw=await readFile(new URL('sw.js',dist),'utf8');
+const stamp=createHash('sha256').update(assets.join('\n')).digest('hex').slice(0,10);
+sw=sw.replace("const CACHE='madar-shell-v2';",`const CACHE='madar-shell-${stamp}';`);
+sw=sw.replace("c.addAll(['/tv'",`c.addAll([${assets.map(a=>JSON.stringify(a)).join(',')},'/tv'`);
+sw=sw.replace("self.clients.claim()","Promise.all([self.clients.claim(),caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('madar-shell-')&&k!==CACHE).map(k=>caches.delete(k))))])");
+await writeFile(new URL('sw.js',dist),sw);console.log('Precached TV shell assets: '+assets.length);

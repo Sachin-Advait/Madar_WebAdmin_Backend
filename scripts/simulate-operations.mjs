@@ -1,0 +1,4 @@
+const origin=process.env.MADAR_URL||'http://127.0.0.1:8000';
+if(!process.env.INTEGRATION_KEY)throw Error('Set INTEGRATION_KEY to match the server');
+const snapshots={meeting:{todayMeetings:18,ongoing:3,upcoming:8,rooms:[{name:'Meeting A',status:'occupied'},{name:'Meeting B',status:'available'}],schedule:[{time:'10:30',room:'Meeting A',title:'Operations review'}]},queue:{servedToday:146,waiting:12,activeCounters:5,calls:[{ticket:'A-042',counter:'Counter 03'},{ticket:'B-018',counter:'Counter 01'}],counters:[{name:'Counter 01',status:'serving'},{name:'Counter 02',status:'available'}]}};
+for(const [kind,body]of Object.entries(snapshots)){const r=await fetch(origin+'/api/integrations/'+kind+'/snapshot',{method:'POST',headers:{Authorization:'Bearer '+process.env.INTEGRATION_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok)throw Error(kind+': '+r.status);console.log(kind+': snapshot accepted')}

@@ -1,0 +1,23 @@
+{
+  "items": [
+    {
+      "kind": "videos",
+      "externalId": "welcome-to-madar-v1",
+      "mediaUrl": "https://media.example/vod/welcome.mp4",
+      "payload": {"title": "Welcome to MADAR", "titleAr": "مرحباً بكم في مدار", "description": "Fictional orientation video for developer preview.", "category": "Orientation", "language": "en", "durationSeconds": 240}
+    },
+    {
+      "kind": "radio",
+      "externalId": "community-radio",
+      "mediaUrl": "https://media.example/radio/community.mp3",
+      "payload": {"title": "Community Radio", "category": "Community", "language": "en"}
+    },
+    {
+      "kind": "replay",
+      "externalId": "news-20261103-1100",
+      "channelExternalId": "news-en",
+      "mediaUrl": "https://media.example/replay/news-20261103-1100.mp4",
+      "payload": {"title": "Morning News", "titleAr": "الأخبار الصباحية", "category": "News", "language": "en", "available": true, "eventStart": "2026-11-03T07:00:00Z", "eventEnd": "2026-11-03T07:30:00Z", "startAt": "2026-11-03T07:30:00Z", "endAt": "2026-11-10T07:30:00Z", "durationSeconds": 1800}
+    }
+  ]
+}

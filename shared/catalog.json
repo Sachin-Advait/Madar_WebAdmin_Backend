@@ -1,0 +1,2827 @@
+{
+  "pages": {
+    "home": "Home",
+    "live-tv": "Live TV",
+    "videos": "Videos",
+    "replay": "Replay",
+    "radio": "Radio",
+    "info-hub": "Info Hub",
+    "info-meetings": "Info Hub / Meeting Rooms",
+    "info-queue": "Info Hub / Queue Management",
+    "info-notices": "Info Hub / Official Notices",
+    "info-events": "Info Hub / Events & Training",
+    "info-services": "Info Hub / Services & Information",
+    "info-visitor": "Info Hub / Visitor Guide",
+    "info-media": "Info Hub / Media Highlights",
+    "info-alerts": "Info Hub / Priority Alerts"
+  },
+  "pageWidgets": {
+    "home": [
+      "featured_banner",
+      "meeting_summary",
+      "queue_summary",
+      "live_channel_row",
+      "video_row",
+      "announcements",
+      "events_row",
+      "radio_row",
+      "info_links"
+    ],
+    "live-tv": [
+      "live_channel_row",
+      "epg_guide"
+    ],
+    "videos": [
+      "featured_banner",
+      "video_categories",
+      "video_row"
+    ],
+    "replay": [
+      "replay_channels",
+      "epg_guide"
+    ],
+    "radio": [
+      "radio_row"
+    ],
+    "info-hub": [
+      "meeting_summary",
+      "queue_summary",
+      "announcements",
+      "events_row",
+      "services_grid",
+      "visitor_directory",
+      "media_highlights",
+      "priority_alerts",
+      "info_links"
+    ],
+    "info-meetings": [
+      "meeting_summary",
+      "meeting_room_grid",
+      "meeting_schedule"
+    ],
+    "info-queue": [
+      "queue_summary",
+      "queue_calling",
+      "queue_counters"
+    ],
+    "info-notices": [
+      "announcements"
+    ],
+    "info-events": [
+      "events_row"
+    ],
+    "info-services": [
+      "services_grid"
+    ],
+    "info-visitor": [
+      "visitor_directory"
+    ],
+    "info-media": [
+      "media_highlights"
+    ],
+    "info-alerts": [
+      "priority_alerts"
+    ]
+  },
+  "widgets": {
+    "featured_banner": {
+      "type": "featured_banner",
+      "label": "Featured Hero",
+      "icon": "images",
+      "source": "featured",
+      "grid": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          },
+          "autoRotateSeconds": {
+            "type": "integer",
+            "title": "Rotation seconds",
+            "minimum": 0,
+            "maximum": 60,
+            "default": 8
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Featured Hero",
+        "limit": 5,
+        "displayStyle": "standard",
+        "autoRotateSeconds": 8
+      }
+    },
+    "live_channel_row": {
+      "type": "live_channel_row",
+      "label": "Live Channels Row",
+      "icon": "tv",
+      "source": "channels",
+      "grid": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Live Channels Row",
+        "limit": 8,
+        "displayStyle": "standard"
+      }
+    },
+    "video_row": {
+      "type": "video_row",
+      "label": "Video Row",
+      "icon": "clapperboard",
+      "source": "videos",
+      "grid": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Video Row",
+        "limit": 8,
+        "displayStyle": "standard"
+      }
+    },
+    "replay_channels": {
+      "type": "replay_channels",
+      "label": "Catch-Up Channels",
+      "icon": "history",
+      "source": "replay",
+      "grid": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Catch-Up Channels",
+        "limit": 8,
+        "displayStyle": "standard"
+      }
+    },
+    "radio_row": {
+      "type": "radio_row",
+      "label": "Radio Stations",
+      "icon": "radio",
+      "source": "radio",
+      "grid": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Radio Stations",
+        "limit": 8,
+        "displayStyle": "standard"
+      }
+    },
+    "meeting_summary": {
+      "type": "meeting_summary",
+      "label": "Meeting KPIs",
+      "icon": "calendar-days",
+      "source": "meeting",
+      "grid": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          },
+          "locationId": {
+            "type": "string",
+            "title": "Location / branch ID"
+          },
+          "refreshSeconds": {
+            "type": "integer",
+            "minimum": 5,
+            "maximum": 300,
+            "default": 20
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Meeting KPIs",
+        "limit": 8,
+        "displayStyle": "standard",
+        "refreshSeconds": 20
+      }
+    },
+    "queue_summary": {
+      "type": "queue_summary",
+      "label": "Queue KPIs",
+      "icon": "users",
+      "source": "queue",
+      "grid": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          },
+          "locationId": {
+            "type": "string",
+            "title": "Location / branch ID"
+          },
+          "refreshSeconds": {
+            "type": "integer",
+            "minimum": 5,
+            "maximum": 300,
+            "default": 10
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Queue KPIs",
+        "limit": 8,
+        "displayStyle": "standard",
+        "refreshSeconds": 10
+      }
+    },
+    "meeting_room_grid": {
+      "type": "meeting_room_grid",
+      "label": "Live Room Status",
+      "icon": "calendar-check",
+      "source": "meeting",
+      "grid": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          },
+          "locationId": {
+            "type": "string",
+            "title": "Location ID"
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Live Room Status",
+        "limit": 8,
+        "displayStyle": "standard"
+      }
+    },
+    "meeting_schedule": {
+      "type": "meeting_schedule",
+      "label": "Upcoming Meetings",
+      "icon": "calendar-range",
+      "source": "meeting",
+      "grid": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          },
+          "locationId": {
+            "type": "string",
+            "title": "Location ID"
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Upcoming Meetings",
+        "limit": 8,
+        "displayStyle": "standard"
+      }
+    },
+    "queue_calling": {
+      "type": "queue_calling",
+      "label": "Calling Now",
+      "icon": "ticket",
+      "source": "queue",
+      "grid": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          },
+          "locationId": {
+            "type": "string",
+            "title": "Location ID"
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Calling Now",
+        "limit": 8,
+        "displayStyle": "standard"
+      }
+    },
+    "queue_counters": {
+      "type": "queue_counters",
+      "label": "Counter Status",
+      "icon": "monitor",
+      "source": "queue",
+      "grid": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          },
+          "locationId": {
+            "type": "string",
+            "title": "Location ID"
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Counter Status",
+        "limit": 8,
+        "displayStyle": "standard"
+      }
+    },
+    "announcements": {
+      "type": "announcements",
+      "label": "Announcement Cards",
+      "icon": "megaphone",
+      "source": "notices",
+      "grid": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Announcement Cards",
+        "limit": 8,
+        "displayStyle": "standard"
+      }
+    },
+    "events_row": {
+      "type": "events_row",
+      "label": "Events & Training",
+      "icon": "calendar-days",
+      "source": "events",
+      "grid": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Events & Training",
+        "limit": 8,
+        "displayStyle": "standard"
+      }
+    },
+    "services_grid": {
+      "type": "services_grid",
+      "label": "Services & Information",
+      "icon": "landmark",
+      "source": "services",
+      "grid": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Services & Information",
+        "limit": 8,
+        "displayStyle": "standard"
+      }
+    },
+    "visitor_directory": {
+      "type": "visitor_directory",
+      "label": "Visitor Directory",
+      "icon": "map-pin",
+      "source": "visitor",
+      "grid": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Visitor Directory",
+        "limit": 8,
+        "displayStyle": "standard"
+      }
+    },
+    "media_highlights": {
+      "type": "media_highlights",
+      "label": "Media Highlights",
+      "icon": "images",
+      "source": "media",
+      "grid": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Media Highlights",
+        "limit": 8,
+        "displayStyle": "standard"
+      }
+    },
+    "priority_alerts": {
+      "type": "priority_alerts",
+      "label": "Priority Alerts",
+      "icon": "shield-alert",
+      "source": "alerts",
+      "grid": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Priority Alerts",
+        "limit": 8,
+        "displayStyle": "standard"
+      }
+    },
+    "epg_guide": {
+      "type": "epg_guide",
+      "label": "Program Guide",
+      "icon": "list",
+      "source": "channels",
+      "grid": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          },
+          "days": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 14,
+            "default": 2
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Program Guide",
+        "limit": 8,
+        "displayStyle": "standard",
+        "days": 2
+      }
+    },
+    "video_categories": {
+      "type": "video_categories",
+      "label": "Video Categories",
+      "icon": "layers",
+      "source": "videos",
+      "grid": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Video Categories",
+        "limit": 8,
+        "displayStyle": "standard"
+      }
+    },
+    "info_links": {
+      "type": "info_links",
+      "label": "Info Hub Shortcuts",
+      "icon": "grid-3x3",
+      "source": "links",
+      "grid": false,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Info Hub Shortcuts",
+        "limit": 8,
+        "displayStyle": "standard"
+      }
+    }
+  },
+  "resources": {
+    "channels": {
+      "label": "TV Channels",
+      "icon": "tv"
+    },
+    "videos": {
+      "label": "Videos / VOD",
+      "icon": "clapperboard"
+    },
+    "replay": {
+      "label": "Catch-Up Sources",
+      "icon": "history"
+    },
+    "radio": {
+      "label": "Radio Stations",
+      "icon": "radio"
+    },
+    "featured": {
+      "label": "Featured Banners",
+      "icon": "images"
+    },
+    "notices": {
+      "label": "Official Notices",
+      "icon": "megaphone"
+    },
+    "events": {
+      "label": "Events & Training",
+      "icon": "calendar-days"
+    },
+    "services": {
+      "label": "Services & Information",
+      "icon": "landmark"
+    },
+    "visitor": {
+      "label": "Visitor Directory",
+      "icon": "map-pinned"
+    },
+    "media": {
+      "label": "Media Highlights",
+      "icon": "images"
+    },
+    "alerts": {
+      "label": "Priority Alerts",
+      "icon": "shield-alert"
+    }
+  },
+  "resourceSchemas": {
+    "channels": {
+      "type": "object",
+      "required": [
+        "title",
+        "status"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "minLength": 2
+        },
+        "titleAr": {
+          "type": "string",
+          "title": "Arabic title"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description"
+        },
+        "category": {
+          "type": "string",
+          "title": "Category"
+        },
+        "image": {
+          "type": "string",
+          "title": "Image / artwork URL"
+        },
+        "status": {
+          "type": "string",
+          "title": "Publication status",
+          "enum": [
+            "draft",
+            "published",
+            "disabled"
+          ],
+          "default": "draft"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "title": "Sort priority",
+          "default": 0
+        },
+        "visibleTo": {
+          "type": "array",
+          "title": "Visible to profiles",
+          "items": {
+            "type": "string",
+            "enum": [
+              "public",
+              "employee",
+              "management",
+              "signage"
+            ]
+          },
+          "uniqueItems": true,
+          "default": [
+            "public",
+            "employee",
+            "management",
+            "signage"
+          ]
+        },
+        "startAt": {
+          "type": "string",
+          "title": "Visible from (ISO datetime)"
+        },
+        "endAt": {
+          "type": "string",
+          "title": "Visible until (ISO datetime)"
+        },
+        "streamRef": {
+          "type": "string",
+          "title": "Stream reference / provider channel ID"
+        },
+        "epgId": {
+          "type": "string",
+          "title": "EPG mapping ID"
+        },
+        "number": {
+          "type": "integer",
+          "title": "Channel number"
+        },
+        "catchupEnabled": {
+          "type": "boolean",
+          "title": "Catch-Up supported"
+        }
+      },
+      "additionalProperties": true
+    },
+    "videos": {
+      "type": "object",
+      "required": [
+        "title",
+        "status"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "minLength": 2
+        },
+        "titleAr": {
+          "type": "string",
+          "title": "Arabic title"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description"
+        },
+        "category": {
+          "type": "string",
+          "title": "Category"
+        },
+        "image": {
+          "type": "string",
+          "title": "Image / artwork URL"
+        },
+        "status": {
+          "type": "string",
+          "title": "Publication status",
+          "enum": [
+            "draft",
+            "published",
+            "disabled"
+          ],
+          "default": "draft"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "title": "Sort priority",
+          "default": 0
+        },
+        "visibleTo": {
+          "type": "array",
+          "title": "Visible to profiles",
+          "items": {
+            "type": "string",
+            "enum": [
+              "public",
+              "employee",
+              "management",
+              "signage"
+            ]
+          },
+          "uniqueItems": true,
+          "default": [
+            "public",
+            "employee",
+            "management",
+            "signage"
+          ]
+        },
+        "startAt": {
+          "type": "string",
+          "title": "Visible from (ISO datetime)"
+        },
+        "endAt": {
+          "type": "string",
+          "title": "Visible until (ISO datetime)"
+        },
+        "videoRef": {
+          "type": "string",
+          "title": "Video asset reference"
+        },
+        "durationSeconds": {
+          "type": "integer",
+          "title": "Duration in seconds",
+          "minimum": 0
+        },
+        "language": {
+          "type": "string",
+          "title": "Language"
+        },
+        "featured": {
+          "type": "boolean",
+          "title": "Feature on Home"
+        }
+      },
+      "additionalProperties": true
+    },
+    "replay": {
+      "type": "object",
+      "required": [
+        "title",
+        "status"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "minLength": 2
+        },
+        "titleAr": {
+          "type": "string",
+          "title": "Arabic title"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description"
+        },
+        "category": {
+          "type": "string",
+          "title": "Category"
+        },
+        "image": {
+          "type": "string",
+          "title": "Image / artwork URL"
+        },
+        "status": {
+          "type": "string",
+          "title": "Publication status",
+          "enum": [
+            "draft",
+            "published",
+            "disabled"
+          ],
+          "default": "draft"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "title": "Sort priority",
+          "default": 0
+        },
+        "visibleTo": {
+          "type": "array",
+          "title": "Visible to profiles",
+          "items": {
+            "type": "string",
+            "enum": [
+              "public",
+              "employee",
+              "management",
+              "signage"
+            ]
+          },
+          "uniqueItems": true,
+          "default": [
+            "public",
+            "employee",
+            "management",
+            "signage"
+          ]
+        },
+        "startAt": {
+          "type": "string",
+          "title": "Visible from (ISO datetime)"
+        },
+        "endAt": {
+          "type": "string",
+          "title": "Visible until (ISO datetime)"
+        },
+        "channelId": {
+          "type": "string",
+          "title": "Channel ID"
+        },
+        "providerRef": {
+          "type": "string",
+          "title": "Provider replay reference"
+        },
+        "retentionDays": {
+          "type": "integer",
+          "title": "Replay window (days)",
+          "minimum": 1,
+          "maximum": 90
+        },
+        "available": {
+          "type": "boolean",
+          "title": "Replay available"
+        }
+      },
+      "additionalProperties": true
+    },
+    "radio": {
+      "type": "object",
+      "required": [
+        "title",
+        "status"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "minLength": 2
+        },
+        "titleAr": {
+          "type": "string",
+          "title": "Arabic title"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description"
+        },
+        "category": {
+          "type": "string",
+          "title": "Category"
+        },
+        "image": {
+          "type": "string",
+          "title": "Image / artwork URL"
+        },
+        "status": {
+          "type": "string",
+          "title": "Publication status",
+          "enum": [
+            "draft",
+            "published",
+            "disabled"
+          ],
+          "default": "draft"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "title": "Sort priority",
+          "default": 0
+        },
+        "visibleTo": {
+          "type": "array",
+          "title": "Visible to profiles",
+          "items": {
+            "type": "string",
+            "enum": [
+              "public",
+              "employee",
+              "management",
+              "signage"
+            ]
+          },
+          "uniqueItems": true,
+          "default": [
+            "public",
+            "employee",
+            "management",
+            "signage"
+          ]
+        },
+        "startAt": {
+          "type": "string",
+          "title": "Visible from (ISO datetime)"
+        },
+        "endAt": {
+          "type": "string",
+          "title": "Visible until (ISO datetime)"
+        },
+        "stationRef": {
+          "type": "string",
+          "title": "Audio stream reference"
+        },
+        "language": {
+          "type": "string",
+          "title": "Language"
+        }
+      },
+      "additionalProperties": true
+    },
+    "featured": {
+      "type": "object",
+      "required": [
+        "title",
+        "status"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "minLength": 2
+        },
+        "titleAr": {
+          "type": "string",
+          "title": "Arabic title"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description"
+        },
+        "category": {
+          "type": "string",
+          "title": "Category"
+        },
+        "image": {
+          "type": "string",
+          "title": "Image / artwork URL"
+        },
+        "status": {
+          "type": "string",
+          "title": "Publication status",
+          "enum": [
+            "draft",
+            "published",
+            "disabled"
+          ],
+          "default": "draft"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "title": "Sort priority",
+          "default": 0
+        },
+        "visibleTo": {
+          "type": "array",
+          "title": "Visible to profiles",
+          "items": {
+            "type": "string",
+            "enum": [
+              "public",
+              "employee",
+              "management",
+              "signage"
+            ]
+          },
+          "uniqueItems": true,
+          "default": [
+            "public",
+            "employee",
+            "management",
+            "signage"
+          ]
+        },
+        "startAt": {
+          "type": "string",
+          "title": "Visible from (ISO datetime)"
+        },
+        "endAt": {
+          "type": "string",
+          "title": "Visible until (ISO datetime)"
+        },
+        "targetType": {
+          "type": "string",
+          "title": "Action type",
+          "enum": [
+            "video",
+            "channel",
+            "event",
+            "notice",
+            "info-page"
+          ]
+        },
+        "targetId": {
+          "type": "string",
+          "title": "Referenced content ID"
+        },
+        "ctaText": {
+          "type": "string",
+          "title": "Button label"
+        }
+      },
+      "additionalProperties": true
+    },
+    "notices": {
+      "type": "object",
+      "required": [
+        "title",
+        "status"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "minLength": 2
+        },
+        "titleAr": {
+          "type": "string",
+          "title": "Arabic title"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description"
+        },
+        "category": {
+          "type": "string",
+          "title": "Category"
+        },
+        "image": {
+          "type": "string",
+          "title": "Image / artwork URL"
+        },
+        "status": {
+          "type": "string",
+          "title": "Publication status",
+          "enum": [
+            "draft",
+            "published",
+            "disabled"
+          ],
+          "default": "draft"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "title": "Sort priority",
+          "default": 0
+        },
+        "visibleTo": {
+          "type": "array",
+          "title": "Visible to profiles",
+          "items": {
+            "type": "string",
+            "enum": [
+              "public",
+              "employee",
+              "management",
+              "signage"
+            ]
+          },
+          "uniqueItems": true,
+          "default": [
+            "public",
+            "employee",
+            "management",
+            "signage"
+          ]
+        },
+        "startAt": {
+          "type": "string",
+          "title": "Visible from (ISO datetime)"
+        },
+        "endAt": {
+          "type": "string",
+          "title": "Visible until (ISO datetime)"
+        },
+        "priority": {
+          "type": "string",
+          "title": "Priority",
+          "enum": [
+            "normal",
+            "important",
+            "urgent"
+          ],
+          "default": "normal"
+        },
+        "attachmentUrl": {
+          "type": "string",
+          "title": "Attachment URL"
+        }
+      },
+      "additionalProperties": true
+    },
+    "events": {
+      "type": "object",
+      "required": [
+        "title",
+        "status"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "minLength": 2
+        },
+        "titleAr": {
+          "type": "string",
+          "title": "Arabic title"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description"
+        },
+        "category": {
+          "type": "string",
+          "title": "Category"
+        },
+        "image": {
+          "type": "string",
+          "title": "Image / artwork URL"
+        },
+        "status": {
+          "type": "string",
+          "title": "Publication status",
+          "enum": [
+            "draft",
+            "published",
+            "disabled"
+          ],
+          "default": "draft"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "title": "Sort priority",
+          "default": 0
+        },
+        "visibleTo": {
+          "type": "array",
+          "title": "Visible to profiles",
+          "items": {
+            "type": "string",
+            "enum": [
+              "public",
+              "employee",
+              "management",
+              "signage"
+            ]
+          },
+          "uniqueItems": true,
+          "default": [
+            "public",
+            "employee",
+            "management",
+            "signage"
+          ]
+        },
+        "startAt": {
+          "type": "string",
+          "title": "Visible from (ISO datetime)"
+        },
+        "endAt": {
+          "type": "string",
+          "title": "Visible until (ISO datetime)"
+        },
+        "venue": {
+          "type": "string",
+          "title": "Venue"
+        },
+        "eventStart": {
+          "type": "string",
+          "title": "Event start ISO datetime"
+        },
+        "eventEnd": {
+          "type": "string",
+          "title": "Event end ISO datetime"
+        },
+        "organizer": {
+          "type": "string",
+          "title": "Organizer"
+        },
+        "videoId": {
+          "type": "string",
+          "title": "Published video reference"
+        }
+      },
+      "additionalProperties": true
+    },
+    "services": {
+      "type": "object",
+      "required": [
+        "title",
+        "status"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "minLength": 2
+        },
+        "titleAr": {
+          "type": "string",
+          "title": "Arabic title"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description"
+        },
+        "category": {
+          "type": "string",
+          "title": "Category"
+        },
+        "image": {
+          "type": "string",
+          "title": "Image / artwork URL"
+        },
+        "status": {
+          "type": "string",
+          "title": "Publication status",
+          "enum": [
+            "draft",
+            "published",
+            "disabled"
+          ],
+          "default": "draft"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "title": "Sort priority",
+          "default": 0
+        },
+        "visibleTo": {
+          "type": "array",
+          "title": "Visible to profiles",
+          "items": {
+            "type": "string",
+            "enum": [
+              "public",
+              "employee",
+              "management",
+              "signage"
+            ]
+          },
+          "uniqueItems": true,
+          "default": [
+            "public",
+            "employee",
+            "management",
+            "signage"
+          ]
+        },
+        "startAt": {
+          "type": "string",
+          "title": "Visible from (ISO datetime)"
+        },
+        "endAt": {
+          "type": "string",
+          "title": "Visible until (ISO datetime)"
+        },
+        "requirements": {
+          "type": "string",
+          "title": "Required documents / prerequisites"
+        },
+        "serviceUrl": {
+          "type": "string",
+          "title": "Approved web service URL"
+        }
+      },
+      "additionalProperties": true
+    },
+    "visitor": {
+      "type": "object",
+      "required": [
+        "title",
+        "status"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "minLength": 2
+        },
+        "titleAr": {
+          "type": "string",
+          "title": "Arabic title"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description"
+        },
+        "category": {
+          "type": "string",
+          "title": "Category"
+        },
+        "image": {
+          "type": "string",
+          "title": "Image / artwork URL"
+        },
+        "status": {
+          "type": "string",
+          "title": "Publication status",
+          "enum": [
+            "draft",
+            "published",
+            "disabled"
+          ],
+          "default": "draft"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "title": "Sort priority",
+          "default": 0
+        },
+        "visibleTo": {
+          "type": "array",
+          "title": "Visible to profiles",
+          "items": {
+            "type": "string",
+            "enum": [
+              "public",
+              "employee",
+              "management",
+              "signage"
+            ]
+          },
+          "uniqueItems": true,
+          "default": [
+            "public",
+            "employee",
+            "management",
+            "signage"
+          ]
+        },
+        "startAt": {
+          "type": "string",
+          "title": "Visible from (ISO datetime)"
+        },
+        "endAt": {
+          "type": "string",
+          "title": "Visible until (ISO datetime)"
+        },
+        "floor": {
+          "type": "string",
+          "title": "Floor"
+        },
+        "building": {
+          "type": "string",
+          "title": "Building"
+        },
+        "openingHours": {
+          "type": "string",
+          "title": "Opening hours"
+        },
+        "directionUrl": {
+          "type": "string",
+          "title": "Directions URL"
+        }
+      },
+      "additionalProperties": true
+    },
+    "media": {
+      "type": "object",
+      "required": [
+        "title",
+        "status"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "minLength": 2
+        },
+        "titleAr": {
+          "type": "string",
+          "title": "Arabic title"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description"
+        },
+        "category": {
+          "type": "string",
+          "title": "Category"
+        },
+        "image": {
+          "type": "string",
+          "title": "Image / artwork URL"
+        },
+        "status": {
+          "type": "string",
+          "title": "Publication status",
+          "enum": [
+            "draft",
+            "published",
+            "disabled"
+          ],
+          "default": "draft"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "title": "Sort priority",
+          "default": 0
+        },
+        "visibleTo": {
+          "type": "array",
+          "title": "Visible to profiles",
+          "items": {
+            "type": "string",
+            "enum": [
+              "public",
+              "employee",
+              "management",
+              "signage"
+            ]
+          },
+          "uniqueItems": true,
+          "default": [
+            "public",
+            "employee",
+            "management",
+            "signage"
+          ]
+        },
+        "startAt": {
+          "type": "string",
+          "title": "Visible from (ISO datetime)"
+        },
+        "endAt": {
+          "type": "string",
+          "title": "Visible until (ISO datetime)"
+        },
+        "targetVideoId": {
+          "type": "string",
+          "title": "Related video ID"
+        },
+        "displayDate": {
+          "type": "string",
+          "title": "Highlight date"
+        }
+      },
+      "additionalProperties": true
+    },
+    "alerts": {
+      "type": "object",
+      "required": [
+        "title",
+        "status"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "minLength": 2
+        },
+        "titleAr": {
+          "type": "string",
+          "title": "Arabic title"
+        },
+        "description": {
+          "type": "string",
+          "title": "Description"
+        },
+        "category": {
+          "type": "string",
+          "title": "Category"
+        },
+        "image": {
+          "type": "string",
+          "title": "Image / artwork URL"
+        },
+        "status": {
+          "type": "string",
+          "title": "Publication status",
+          "enum": [
+            "draft",
+            "published",
+            "disabled"
+          ],
+          "default": "draft"
+        },
+        "sortOrder": {
+          "type": "integer",
+          "title": "Sort priority",
+          "default": 0
+        },
+        "visibleTo": {
+          "type": "array",
+          "title": "Visible to profiles",
+          "items": {
+            "type": "string",
+            "enum": [
+              "public",
+              "employee",
+              "management",
+              "signage"
+            ]
+          },
+          "uniqueItems": true,
+          "default": [
+            "public",
+            "employee",
+            "management",
+            "signage"
+          ]
+        },
+        "startAt": {
+          "type": "string",
+          "title": "Visible from (ISO datetime)"
+        },
+        "endAt": {
+          "type": "string",
+          "title": "Visible until (ISO datetime)"
+        },
+        "severity": {
+          "type": "string",
+          "title": "Severity",
+          "enum": [
+            "info",
+            "warning",
+            "critical"
+          ],
+          "default": "info"
+        },
+        "fullScreenOverride": {
+          "type": "boolean",
+          "title": "Allow authorized full-screen override"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "defaults": {
+    "home": {
+      "schemaVersion": 1,
+      "pageKey": "home",
+      "sections": [
+        {
+          "id": "featured_banner-1",
+          "type": "featured_banner",
+          "enabled": true,
+          "order": 0,
+          "props": {
+            "title": "Featured Hero",
+            "limit": 5,
+            "displayStyle": "standard",
+            "autoRotateSeconds": 8
+          },
+          "layout": {
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 4
+          }
+        },
+        {
+          "id": "meeting_summary-2",
+          "type": "meeting_summary",
+          "enabled": true,
+          "order": 1,
+          "props": {
+            "title": "Meeting KPIs",
+            "limit": 8,
+            "displayStyle": "standard",
+            "refreshSeconds": 20
+          },
+          "layout": {
+            "x": 6,
+            "y": 0,
+            "w": 6,
+            "h": 4
+          }
+        },
+        {
+          "id": "queue_summary-3",
+          "type": "queue_summary",
+          "enabled": true,
+          "order": 2,
+          "props": {
+            "title": "Queue KPIs",
+            "limit": 8,
+            "displayStyle": "standard",
+            "refreshSeconds": 10
+          },
+          "layout": {
+            "x": 0,
+            "y": 4,
+            "w": 6,
+            "h": 4
+          }
+        },
+        {
+          "id": "live_channel_row-4",
+          "type": "live_channel_row",
+          "enabled": true,
+          "order": 3,
+          "props": {
+            "title": "Live Channels Row",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 12,
+            "w": 12,
+            "h": 4
+          }
+        },
+        {
+          "id": "video_row-5",
+          "type": "video_row",
+          "enabled": true,
+          "order": 4,
+          "props": {
+            "title": "Video Row",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 16,
+            "w": 12,
+            "h": 4
+          }
+        },
+        {
+          "id": "announcements-6",
+          "type": "announcements",
+          "enabled": true,
+          "order": 5,
+          "props": {
+            "title": "Announcement Cards",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 20,
+            "w": 12,
+            "h": 4
+          }
+        },
+        {
+          "id": "events_row-7",
+          "type": "events_row",
+          "enabled": true,
+          "order": 6,
+          "props": {
+            "title": "Events & Training",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 24,
+            "w": 12,
+            "h": 4
+          }
+        }
+      ]
+    },
+    "live-tv": {
+      "schemaVersion": 1,
+      "pageKey": "live-tv",
+      "sections": [
+        {
+          "id": "live_channel_row-1",
+          "type": "live_channel_row",
+          "enabled": true,
+          "order": 0,
+          "props": {
+            "title": "Live Channels Row",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 4
+          }
+        },
+        {
+          "id": "epg_guide-2",
+          "type": "epg_guide",
+          "enabled": true,
+          "order": 1,
+          "props": {
+            "title": "Program Guide",
+            "limit": 8,
+            "displayStyle": "standard",
+            "days": 2
+          },
+          "layout": {
+            "x": 0,
+            "y": 4,
+            "w": 12,
+            "h": 4
+          }
+        }
+      ]
+    },
+    "videos": {
+      "schemaVersion": 1,
+      "pageKey": "videos",
+      "sections": [
+        {
+          "id": "featured_banner-1",
+          "type": "featured_banner",
+          "enabled": true,
+          "order": 0,
+          "props": {
+            "title": "Featured Hero",
+            "limit": 5,
+            "displayStyle": "standard",
+            "autoRotateSeconds": 8
+          },
+          "layout": {
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 4
+          }
+        },
+        {
+          "id": "video_categories-2",
+          "type": "video_categories",
+          "enabled": true,
+          "order": 1,
+          "props": {
+            "title": "Video Categories",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 4,
+            "w": 12,
+            "h": 4
+          }
+        },
+        {
+          "id": "video_row-3",
+          "type": "video_row",
+          "enabled": true,
+          "order": 2,
+          "props": {
+            "title": "Video Row",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 8,
+            "w": 12,
+            "h": 4
+          }
+        }
+      ]
+    },
+    "replay": {
+      "schemaVersion": 1,
+      "pageKey": "replay",
+      "sections": [
+        {
+          "id": "replay_channels-1",
+          "type": "replay_channels",
+          "enabled": true,
+          "order": 0,
+          "props": {
+            "title": "Catch-Up Channels",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 4
+          }
+        },
+        {
+          "id": "epg_guide-2",
+          "type": "epg_guide",
+          "enabled": true,
+          "order": 1,
+          "props": {
+            "title": "Program Guide",
+            "limit": 8,
+            "displayStyle": "standard",
+            "days": 2
+          },
+          "layout": {
+            "x": 0,
+            "y": 4,
+            "w": 12,
+            "h": 4
+          }
+        }
+      ]
+    },
+    "radio": {
+      "schemaVersion": 1,
+      "pageKey": "radio",
+      "sections": [
+        {
+          "id": "radio_row-1",
+          "type": "radio_row",
+          "enabled": true,
+          "order": 0,
+          "props": {
+            "title": "Radio Stations",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 4
+          }
+        }
+      ]
+    },
+    "info-hub": {
+      "schemaVersion": 1,
+      "pageKey": "info-hub",
+      "sections": [
+        {
+          "id": "meeting_summary-1",
+          "type": "meeting_summary",
+          "enabled": true,
+          "order": 0,
+          "props": {
+            "title": "Meeting KPIs",
+            "limit": 8,
+            "displayStyle": "standard",
+            "refreshSeconds": 20
+          },
+          "layout": {
+            "x": 0,
+            "y": 0,
+            "w": 6,
+            "h": 4
+          }
+        },
+        {
+          "id": "queue_summary-2",
+          "type": "queue_summary",
+          "enabled": true,
+          "order": 1,
+          "props": {
+            "title": "Queue KPIs",
+            "limit": 8,
+            "displayStyle": "standard",
+            "refreshSeconds": 10
+          },
+          "layout": {
+            "x": 6,
+            "y": 0,
+            "w": 6,
+            "h": 4
+          }
+        },
+        {
+          "id": "info_links-3",
+          "type": "info_links",
+          "enabled": true,
+          "order": 2,
+          "props": {
+            "title": "Info Hub Shortcuts",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 8,
+            "w": 12,
+            "h": 4
+          }
+        },
+        {
+          "id": "announcements-4",
+          "type": "announcements",
+          "enabled": true,
+          "order": 3,
+          "props": {
+            "title": "Announcement Cards",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 12,
+            "w": 12,
+            "h": 4
+          }
+        },
+        {
+          "id": "events_row-5",
+          "type": "events_row",
+          "enabled": true,
+          "order": 4,
+          "props": {
+            "title": "Events & Training",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 16,
+            "w": 12,
+            "h": 4
+          }
+        },
+        {
+          "id": "services_grid-6",
+          "type": "services_grid",
+          "enabled": true,
+          "order": 5,
+          "props": {
+            "title": "Services & Information",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 20,
+            "w": 12,
+            "h": 4
+          }
+        }
+      ]
+    },
+    "info-meetings": {
+      "schemaVersion": 1,
+      "pageKey": "info-meetings",
+      "sections": [
+        {
+          "id": "meeting_summary-1",
+          "type": "meeting_summary",
+          "enabled": true,
+          "order": 0,
+          "props": {
+            "title": "Meeting KPIs",
+            "limit": 8,
+            "displayStyle": "standard",
+            "refreshSeconds": 20
+          },
+          "layout": {
+            "x": 0,
+            "y": 0,
+            "w": 6,
+            "h": 4
+          }
+        },
+        {
+          "id": "meeting_room_grid-2",
+          "type": "meeting_room_grid",
+          "enabled": true,
+          "order": 1,
+          "props": {
+            "title": "Live Room Status",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 6,
+            "y": 0,
+            "w": 6,
+            "h": 4
+          }
+        },
+        {
+          "id": "meeting_schedule-3",
+          "type": "meeting_schedule",
+          "enabled": true,
+          "order": 2,
+          "props": {
+            "title": "Upcoming Meetings",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 4,
+            "w": 6,
+            "h": 4
+          }
+        }
+      ]
+    },
+    "info-queue": {
+      "schemaVersion": 1,
+      "pageKey": "info-queue",
+      "sections": [
+        {
+          "id": "queue_summary-1",
+          "type": "queue_summary",
+          "enabled": true,
+          "order": 0,
+          "props": {
+            "title": "Queue KPIs",
+            "limit": 8,
+            "displayStyle": "standard",
+            "refreshSeconds": 10
+          },
+          "layout": {
+            "x": 0,
+            "y": 0,
+            "w": 6,
+            "h": 4
+          }
+        },
+        {
+          "id": "queue_calling-2",
+          "type": "queue_calling",
+          "enabled": true,
+          "order": 1,
+          "props": {
+            "title": "Calling Now",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 6,
+            "y": 0,
+            "w": 6,
+            "h": 4
+          }
+        },
+        {
+          "id": "queue_counters-3",
+          "type": "queue_counters",
+          "enabled": true,
+          "order": 2,
+          "props": {
+            "title": "Counter Status",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 4,
+            "w": 6,
+            "h": 4
+          }
+        }
+      ]
+    },
+    "info-notices": {
+      "schemaVersion": 1,
+      "pageKey": "info-notices",
+      "sections": [
+        {
+          "id": "announcements-1",
+          "type": "announcements",
+          "enabled": true,
+          "order": 0,
+          "props": {
+            "title": "Announcement Cards",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 4
+          }
+        }
+      ]
+    },
+    "info-events": {
+      "schemaVersion": 1,
+      "pageKey": "info-events",
+      "sections": [
+        {
+          "id": "events_row-1",
+          "type": "events_row",
+          "enabled": true,
+          "order": 0,
+          "props": {
+            "title": "Events & Training",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 4
+          }
+        }
+      ]
+    },
+    "info-services": {
+      "schemaVersion": 1,
+      "pageKey": "info-services",
+      "sections": [
+        {
+          "id": "services_grid-1",
+          "type": "services_grid",
+          "enabled": true,
+          "order": 0,
+          "props": {
+            "title": "Services & Information",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 4
+          }
+        }
+      ]
+    },
+    "info-visitor": {
+      "schemaVersion": 1,
+      "pageKey": "info-visitor",
+      "sections": [
+        {
+          "id": "visitor_directory-1",
+          "type": "visitor_directory",
+          "enabled": true,
+          "order": 0,
+          "props": {
+            "title": "Visitor Directory",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 4
+          }
+        }
+      ]
+    },
+    "info-media": {
+      "schemaVersion": 1,
+      "pageKey": "info-media",
+      "sections": [
+        {
+          "id": "media_highlights-1",
+          "type": "media_highlights",
+          "enabled": true,
+          "order": 0,
+          "props": {
+            "title": "Media Highlights",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 4
+          }
+        }
+      ]
+    },
+    "info-alerts": {
+      "schemaVersion": 1,
+      "pageKey": "info-alerts",
+      "sections": [
+        {
+          "id": "priority_alerts-1",
+          "type": "priority_alerts",
+          "enabled": true,
+          "order": 0,
+          "props": {
+            "title": "Priority Alerts",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 0,
+            "y": 0,
+            "w": 12,
+            "h": 4
+          }
+        }
+      ]
+    }
+  },
+  "seeds": {
+    "channels": [
+      [
+        "Oman TV",
+        "News",
+        "LOCAL-01"
+      ],
+      [
+        "News Channel",
+        "News",
+        "NEWS-01"
+      ],
+      [
+        "Documentary Channel",
+        "Documentaries",
+        "DOC-01"
+      ],
+      [
+        "Business News",
+        "Business",
+        "BUS-01"
+      ]
+    ],
+    "videos": [
+      [
+        "Organization Overview",
+        "Corporate",
+        "VID-001"
+      ],
+      [
+        "Digital Services Explained",
+        "Awareness",
+        "VID-002"
+      ],
+      [
+        "Highlights of the Year",
+        "Events",
+        "VID-003"
+      ],
+      [
+        "Employee Training",
+        "Training",
+        "VID-004"
+      ]
+    ],
+    "replay": [
+      [
+        "Oman TV Catch-Up",
+        "News",
+        "CH-001"
+      ],
+      [
+        "Documentary Catch-Up",
+        "Documentaries",
+        "CH-003"
+      ]
+    ],
+    "radio": [
+      [
+        "National Radio",
+        "Local",
+        "RAD-001"
+      ],
+      [
+        "News Radio",
+        "News",
+        "RAD-002"
+      ]
+    ],
+    "featured": [
+      [
+        "New Digital Services",
+        "Services",
+        "VID-002"
+      ],
+      [
+        "Featured Live Broadcast",
+        "TV",
+        "CH-001"
+      ]
+    ],
+    "notices": [
+      [
+        "Updated Working Hours",
+        "General",
+        ""
+      ],
+      [
+        "Scheduled Maintenance Notice",
+        "Services",
+        ""
+      ]
+    ],
+    "events": [
+      [
+        "Digital Innovation Forum",
+        "Conference",
+        ""
+      ],
+      [
+        "Staff Training Workshop",
+        "Training",
+        ""
+      ]
+    ],
+    "services": [
+      [
+        "General Services",
+        "Service",
+        ""
+      ],
+      [
+        "Application Requirements",
+        "Guide",
+        ""
+      ]
+    ],
+    "visitor": [
+      [
+        "Reception",
+        "Directory",
+        ""
+      ],
+      [
+        "Information Desk",
+        "Directory",
+        ""
+      ]
+    ],
+    "media": [
+      [
+        "Innovation Highlights",
+        "News",
+        ""
+      ],
+      [
+        "Annual Event Highlights",
+        "Events",
+        ""
+      ]
+    ],
+    "alerts": [
+      [
+        "System Status Information",
+        "Information",
+        ""
+      ]
+    ]
+  }
+}

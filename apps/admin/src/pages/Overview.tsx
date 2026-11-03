@@ -1,0 +1,18 @@
+import React from 'react';
+import {useQuery} from '@tanstack/react-query';
+import {Activity,ArrowRight,Clapperboard,LayoutTemplate,Monitor,Radio,ShieldCheck,Tv2} from 'lucide-react';
+import {API} from '../api';
+import {PageHeading,Loading,ErrorBox,Card,Status} from '../components/Common';
+
+export default function Overview({navigate}:{navigate:(id:string)=>void}){
+ const {data,error,isLoading}=useQuery({queryKey:['overview'],queryFn:API.overview});
+ if(isLoading)return <Loading/>; if(error||!data)return <ErrorBox error={error}/>;
+ const tiles=[{label:'Live TV channels',value:data.contentCounts?.channels||0,icon:Tv2,color:'blue'},{label:'Video library items',value:data.contentCounts?.videos||0,icon:Clapperboard,color:'bronze'},{label:'Registered screens',value:data.screens||0,icon:Monitor,color:'sage'},{label:'Page configurations',value:data.layouts||0,icon:LayoutTemplate,color:'purple'}];
+ return <><PageHeading eyebrow="WORKSPACE OVERVIEW" title="Good to see you in MADAR" subtitle="Your television experiences, digital content and information displays in one place."><span className="header-marker">● &nbsp; Reference environment</span></PageHeading>
+  <div className="hero-dashboard"><div><span className="eyebrow light">CONTENT & EXPERIENCE OPERATIONS</span><h2>Bring every screen<br/>to life.</h2><p>Build, arrange, preview and publish television interfaces without touching the Flutter viewer.</p><button onClick={()=>navigate('page-builder')} className="hero-button">Open Page Builder <ArrowRight size={16}/></button></div><div className="hero-graphic"><span className="orbital one"></span><span className="orbital two"></span><div className="orbit-icon">M</div></div></div>
+  <div className="kpi-grid">{tiles.map(t=><div className="kpi-card" key={t.label}><div className={`kpi-icon kpi-${t.color}`}><t.icon size={22}/></div><span>{t.label}</span><strong>{t.value}</strong><small>Configured in the reference workspace</small></div>)}</div>
+  <div className="overview-columns"><Card><div className="card-head"><div><h3>Quick actions</h3><p>Jump into the most common workflows</p></div></div><div className="quick-grid">{[{name:'Arrange Home sections',info:'Drag, configure and save',icon:LayoutTemplate,view:'page-builder'},{name:'Design KPI dashboard',info:'Resize operational widgets',icon:Activity,view:'dashboard-builder'},{name:'Preview TV layout',info:'Draft and published views',icon:Monitor,view:'preview'},{name:'Manage displays',info:'Assign profiles and screens',icon:ShieldCheck,view:'screens'}].map(a=><button className="quick-item" key={a.name} onClick={()=>navigate(a.view)}><a.icon size={21}/><div><strong>{a.name}</strong><span>{a.info}</span></div><ArrowRight size={16}/></button>)}</div></Card>
+  <Card><div className="card-head"><div><h3>Recent activity</h3><p>Latest changes in your workspace</p></div><button className="text-link" onClick={()=>navigate('audit')}>View audit <ArrowRight size={14}/></button></div><div className="activity-list">{data.recentActivity?.length?data.recentActivity.slice(0,6).map((a:any,i:number)=><div className="activity-item" key={i}><div className="activity-indicator"/><div><strong>{a.action.replaceAll('-',' ')} · {a.entity}</strong><small>{a.actor} · {new Date(a.occurred_at).toLocaleString()}</small></div></div>):<div className="soft-note">Activity appears after you edit or publish content.</div>}</div></Card></div>
+  <div className="info-strip"><ShieldCheck size={19}/><span>TV viewers receive only published configurations for their assigned profile. Draft edits stay in Admin Studio until published.</span></div>
+ </>
+}

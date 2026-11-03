@@ -1,0 +1,20 @@
+import '@fontsource/dm-sans/latin-400.css';
+import '@fontsource/dm-sans/latin-500.css';
+import '@fontsource/dm-sans/latin-600.css';
+import '@fontsource/noto-sans-arabic/arabic-400.css';
+import TVDevice from './pages/TVDevice';
+import React from 'react';
+import {createRoot} from 'react-dom/client';
+import {QueryClient,QueryClientProvider} from '@tanstack/react-query';
+import App from './App';
+import './styles.css';
+import './premium.css';
+import './tv.css';
+import './control.css';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
+import './navigation.css';
+const client=new QueryClient({defaultOptions:{queries:{retry:1,refetchOnWindowFocus:false,staleTime:8000}}});
+createRoot(document.getElementById('root')!).render(<React.StrictMode><QueryClientProvider client={client}>{location.pathname==='/tv'&&import.meta.env.VITE_SHOWCASE!=='1'?<TVDevice/>:<App/>}</QueryClientProvider></React.StrictMode>);
+
+if(location.pathname==='/tv'&&import.meta.env.VITE_SHOWCASE!=='1'&&'serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});

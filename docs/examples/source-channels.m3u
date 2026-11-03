@@ -1,0 +1,5 @@
+#EXTM3U
+#EXTINF:-1 tvg-id="news-en" tvg-chno="12" group-title="News",MADAR News
+https://media.example/live/news/index.m3u8
+#EXTINF:-1 tvg-id="culture-ar" tvg-chno="21" group-title="Culture",MADAR Culture
+https://media.example/live/culture/index.m3u8

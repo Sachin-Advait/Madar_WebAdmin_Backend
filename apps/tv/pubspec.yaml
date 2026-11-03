@@ -1,0 +1,35 @@
+name: madar_tv
+description: MADAR managed TV and touch player
+publish_to: none
+version: 4.0.0+400
+environment:
+  sdk: ">=3.13.0 <4.0.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  http: 1.6.0
+  crypto: 3.0.8
+  flutter_secure_storage: 11.2.0
+  path_provider: 2.1.6
+  video_player: 2.14.1
+  flutter_svg: 2.3.2
+  qr_flutter: 4.1.0
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/madar-logo.png
+    - assets/art/
+    - assets/demo.json
+  fonts:
+    - family: MadarSans
+      fonts:
+        - asset: assets/fonts/dmsans.ttf
+    - family: MadarArabic
+      fonts:
+        - asset: assets/fonts/notosansarabic.ttf

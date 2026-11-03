@@ -1,0 +1,5 @@
+import net from 'node:net';
+export async function scanBuffer(bytes,{host=process.env.CLAMAV_HOST,port=Number(process.env.CLAMAV_PORT||3310)}={}){
+ if(!host)throw Error('Malware scanner is not configured');
+ return new Promise((resolve,reject)=>{const socket=net.createConnection({host,port}),chunks=[];let settled=false;const fail=e=>{if(!settled){settled=true;socket.destroy();reject(e)}};socket.setTimeout(60000,()=>fail(Error('Scanner timeout')));socket.on('error',fail);socket.on('data',b=>chunks.push(b));socket.on('end',()=>{const result=Buffer.concat(chunks).toString('utf8');if(!result.includes('stream: OK'))return fail(Error('Scanner rejected upload'));settled=true;resolve()});socket.on('connect',async()=>{try{socket.write('zINSTREAM\0');for(let i=0;i<bytes.length;i+=65536){const b=bytes.subarray(i,i+65536),size=Buffer.alloc(4);size.writeUInt32BE(b.length);socket.write(size);if(!socket.write(b))await new Promise((r,j)=>{socket.once('drain',r);socket.once('error',j)})}socket.write(Buffer.alloc(4))}catch(e){fail(e)}})})
+}

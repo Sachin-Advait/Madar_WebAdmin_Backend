@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: madar
+      POSTGRES_USER: madar
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a unique database password}
+    volumes: ["postgres_data:/var/lib/postgresql"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U madar -d madar"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec", "--maxmemory", "256mb", "--maxmemory-policy", "noeviction"]
+    volumes: ["redis_data:/data"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  clamav:
+    image: clamav/clamav:stable
+    restart: unless-stopped
+    volumes: ["clamav_data:/var/lib/clamav"]
+  api:
+    build: .
+    restart: unless-stopped
+    init: true
+    environment:
+      DATABASE_URL: postgresql://madar:${POSTGRES_PASSWORD}@postgres:5432/madar
+      REDIS_URL: redis://redis:6379
+      APP_ORIGIN: https://${MADAR_HOST:?Set your hostname}
+      BOOTSTRAP_EMAIL: ${BOOTSTRAP_EMAIL:?Set administrator email}
+      BOOTSTRAP_PASSWORD: ${BOOTSTRAP_PASSWORD:?Set a unique 14-character or longer password}
+      INTEGRATION_KEY: ${INTEGRATION_KEY:?Set a random integration key}
+      TRUST_PROXY: "1"
+      ASSET_PATH: /app/data/assets
+      CLAMAV_HOST: clamav
+    volumes: ["media_data:/app/data/assets"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      MADAR_HOST: ${MADAR_HOST}
+    ports: ["80:80", "443:443"]
+    volumes: ["./infra/Caddyfile:/etc/caddy/Caddyfile:ro", "caddy_data:/data", "caddy_config:/config"]
+    depends_on: [api]
+volumes:
+  postgres_data:
+  redis_data:
+  media_data:
+  caddy_data:
+  caddy_config:
+  clamav_data:

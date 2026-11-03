@@ -1,0 +1,14 @@
+export type ProfileType = 'public'|'employee'|'management'|'vip'|'signage';
+export type Role = 'admin'|'editor'|'viewer';
+export type User = {id:string; email:string; name:string; role:Role};
+export type LayoutPosition = {x:number; y:number; w:number; h:number};
+export type LayoutSection = {id:string;type:string;enabled:boolean;order:number;props:Record<string,unknown>;layout:LayoutPosition};
+export type PageLayout = {schemaVersion:1;pageKey:string;sections:LayoutSection[]};
+export type LayoutResponse={pageKey:string;profileId:string;draft:PageLayout;published:PageLayout|null;revision:number;publishedVersion:number;updatedAt:string};
+export type WidgetDefinition={type:string;label:string;icon:string;source:string;grid:boolean;schema:Record<string,any>;defaults:Record<string,unknown>};
+export type Catalog={pages:Record<string,string>;pageWidgets:Record<string,string[]>;widgets:Record<string,WidgetDefinition>;resources:Record<string,{label:string;icon:string}>;resourceSchemas:Record<string,any>;demo:boolean};
+export type TVProfile={id:string;name:string;description:string;profileType:ProfileType;theme:Record<string,unknown>;allowedSections:string[];experience?:import('./components/ExperienceSettings').Experience};
+export type Screen={id:string;name:string;profileId:string;location:string;groupName:string;assignedPage:string;lastSeen:string|null;enabled:boolean;orientationOverride?:'inherit'|'auto'|'landscape'|'portrait'};
+export type Resource={id:string;title:string;status:string;[key:string]:any};
+export type PreviewSection=LayoutSection & {source:string;data:any};
+export type PreviewResponse={schemaVersion:number;pageKey:string;profileId:string;theme:Record<string,unknown>;sections:PreviewSection[];publishedVersion:number|null;generatedAt:string};

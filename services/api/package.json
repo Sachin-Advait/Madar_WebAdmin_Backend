@@ -1,0 +1,30 @@
+{
+  "name": "@madar/api",
+  "version": "4.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@electric-sql/pglite": "^0.3.14",
+    "@socket.io/redis-adapter": "^8.3.0",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "cookie-parser": "^1.4.7",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "file-type": "^21.0.0",
+    "helmet": "^8.1.0",
+    "multer": "^2.0.2",
+    "pg": "^8.16.3",
+    "pino": "^10.0.0",
+    "pino-http": "^11.0.0",
+    "rate-limit-redis": "^4.2.1",
+    "redis": "^5.8.3",
+    "sharp": "^0.35.5",
+    "socket.io": "^4.8.1",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "light-my-request": "^6.8.0",
+    "supertest": "^7.1.4"
+  }
+}

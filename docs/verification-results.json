@@ -1,0 +1,65 @@
+{
+  "version": "4.0.0",
+  "verifiedAt": "2026-11-03T06:06:04.633Z",
+  "runtime": {
+    "node": "24.20.0",
+    "flutter": "3.47.9",
+    "dart": "3.13.7"
+  },
+  "tests": {
+    "backend": 48,
+    "redisStreams": 15,
+    "flutter": 42,
+    "total": 109,
+    "failed": 0,
+    "skipped": 0,
+    "additionalVisualRenderer": 1,
+    "adminNavigation": 4
+  },
+  "checks": {
+    "typescript": "passed",
+    "productionAdminBuild": "passed",
+    "dartAnalysis": "no issues",
+    "npmAdvisories": 0,
+    "offlinePreview": "passed",
+    "offlineAdapterSmoke": "passed",
+    "apiPaths": 62,
+    "publishedSampleRecords": 145,
+    "masterLists": 9,
+    "reviewImages": 11,
+    "adminDestinations": 38,
+    "actualBrowserNavigation": {
+      "pagesOpened": 38,
+      "narrowViewportWidth": 540,
+      "menu": "passed",
+      "escape": "passed",
+      "focusRestore": "passed",
+      "date": "2026-11-03"
+    }
+  },
+  "notVerified": [
+    "signed APK/AAB",
+    "physical TV and native playback/PDF",
+    "production PostgreSQL/Compose/failover/load",
+    "full browser forms/uploads/drag-and-drop acceptance",
+    "actual headend/vendor integration"
+  ],
+  "navigationFollowUp": {
+    "date": "2026-11-03",
+    "testsPassed": 4,
+    "sections": 38,
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "offlineBuild": "passed"
+  },
+  "fullHandoverRecheck": {
+    "backend": "passed",
+    "redisStreams": "passed",
+    "flutter": "passed",
+    "adminNavigation": "passed",
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "dartAnalysis": "no issues",
+    "allSuitesRerun": true
+  }
+}
