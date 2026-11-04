@@ -10,6 +10,7 @@ import App from './App';
 import './styles.css';
 import './premium.css';
 import './tv.css';
+import './tv-old-iptv.css';
 import './control.css';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';

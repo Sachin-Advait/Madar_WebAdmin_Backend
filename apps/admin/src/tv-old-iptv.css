@@ -1,0 +1,63 @@
+/* Old IPTV TV look for the browser TV: Poppins, warm off-white background and
+   the brown palette (iptv/lib/configs/theme/app_colors.dart), header tabs with
+   a gradient wash, full-width fading banner, white Play pill, beige cards. */
+@font-face{font-family:'Poppins';src:url('/fonts/Poppins-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
+@font-face{font-family:'Poppins';src:url('/fonts/Poppins-Medium.ttf') format('truetype');font-weight:500;font-display:swap}
+@font-face{font-family:'Poppins';src:url('/fonts/Poppins-SemiBold.ttf') format('truetype');font-weight:600;font-display:swap}
+@font-face{font-family:'Poppins';src:url('/fonts/Poppins-Bold.ttf') format('truetype');font-weight:700;font-display:swap}
+.tv-experience{--tv-accent:#766242;--tv-bg:#f7f3f0;--tv-beige:#bbb1a1;--tv-light:#e8e5df;--tv-deep:#3b3121;--tv-ink:#14100b;background:var(--tv-bg);color:var(--tv-ink);font-family:'Poppins','Noto Sans Arabic',Arial,sans-serif;border-color:var(--tv-light)}
+.tv-experience h1,.tv-experience h3,.tv-page-title h1,.tv-feature h1,.tv-detail h1{font-family:'Poppins','Noto Sans Arabic',sans-serif;letter-spacing:0}
+.tv-nav{background:var(--tv-bg);border-bottom:0;height:auto;padding:6px 24px 12px;gap:24px}
+.tv-nav>img{width:48px;height:48px}
+.tv-nav nav{gap:12px}
+.tv-nav nav button{border-radius:0;padding:10px 20px;font-size:14px;font-weight:500;color:var(--tv-ink);background:transparent;box-shadow:none}
+.tv-nav nav button.active{background:linear-gradient(var(--tv-bg),var(--tv-beige));color:var(--tv-accent);font-weight:600;box-shadow:none}
+.tv-nav nav button:focus-visible{outline:0;transform:none;background:linear-gradient(var(--tv-bg),var(--tv-beige));color:var(--tv-accent);font-weight:600;box-shadow:0 3px 0 var(--tv-accent)}
+.tv-nav>button{width:42px;height:42px;border-radius:50%;border:0;background:var(--tv-light);color:var(--tv-deep);display:grid;place-items:center}
+.tv-time strong{color:var(--tv-ink);font-weight:500}.tv-time small{color:var(--tv-accent)}
+.tv-page-body{padding:0 24px 24px}
+.tv-feature{height:300px;border-radius:0;margin:0 -24px;background-size:cover;background-position:center}
+.tv-feature-shade{background:linear-gradient(180deg,transparent 50%,#ffffff1a 70%,#f7f3f099 85%,var(--tv-bg) 100%)}
+.tv-feature-copy{position:absolute;left:26px;bottom:16px;max-width:60%;padding:0}
+.tv-feature .tv-overline,.tv-feature h1,.tv-feature p{display:none}
+.tv-feature button{background:#fff;color:var(--tv-ink);border-radius:30px;padding:6px 14px;font-size:16px;font-weight:600;gap:6px;margin:0;transition:transform .2s,background .2s}
+.tv-feature button:hover,.tv-feature button:focus-visible{background:var(--tv-beige);transform:scale(1.2);box-shadow:0 0 12px 2px #bbb1a199;outline:0}
+.tv-slide-index{right:16px;bottom:16px;color:var(--tv-accent)}
+.tv-slide-index i{background:var(--tv-accent)}
+.tv-section-title>span{font-size:18px;font-weight:700;color:var(--tv-ink)}
+.tv-section-title>small,.tv-sample-label{color:var(--tv-accent);background:var(--tv-light);border:0;border-radius:20px;padding:3px 10px;font-weight:600}
+.tv-page-title{margin:12px 0 16px}.tv-page-title h1{font-size:22px;font-weight:700;color:var(--tv-ink);margin:4px 0}.tv-page-title p{font-size:11px;color:var(--tv-deep)}
+.tv-overline{color:var(--tv-accent)}
+.tv-categories{gap:4px}
+.tv-categories button{border:0;border-radius:0;background:transparent;color:var(--tv-ink);font-weight:500;padding:9px 16px}
+.tv-categories button.active,.tv-categories button:focus-visible{background:linear-gradient(var(--tv-bg),var(--tv-beige));color:var(--tv-accent);font-weight:600;outline:0}
+.tv-categories button:focus-visible{box-shadow:0 3px 0 var(--tv-accent)}
+.tv-content-card{background:var(--tv-light);border:0;border-radius:16px;color:var(--tv-deep);transition:transform .2s,box-shadow .2s,background .2s}
+.tv-content-card:hover,.tv-content-card:focus-visible{background:var(--tv-beige);transform:scale(1.08);box-shadow:2px 2px 6px 2px #00000033;outline:0;z-index:3}
+.tv-content-card .content-art+.tv-card-copy{background:#766242eb;color:#fff;padding:6px 14px}
+.tv-content-card .content-art+.tv-card-copy small,.tv-content-card .content-art+.tv-card-copy p{color:#ffffffe6}
+.tv-content-card .content-art+.tv-card-copy h3{color:#fff;font-size:13px;font-weight:600;margin-top:2px}
+.tv-card-copy h3{font-weight:600}
+.content-art-placeholder{background:var(--tv-beige);color:#fff}
+.station-art,.station-1,.station-2,.station-3{background:var(--tv-light);color:var(--tv-deep)}
+.tv-operation,.tv-operation.queue,.tv-operation.helpdesk,.tv-operation.tasks,.tv-guide{background:#fff;border:1px solid var(--tv-light);border-radius:16px}
+.tv-operation .tv-section-title>span{color:var(--tv-ink);font-weight:700}
+.tv-metrics b{color:var(--tv-ink);font-weight:700}.tv-metrics span{color:var(--tv-deep)}
+.tv-room-cards>div,.tv-call-cards>div{background:var(--tv-light);border:0;border-radius:12px}
+.tv-guide>button,.tv-guide>button:nth-child(even){background:var(--tv-light);color:var(--tv-deep);border-bottom:1px solid var(--tv-bg)}
+.tv-guide>button b{color:var(--tv-ink)}
+.info-tv-grid button,.info-tv-grid button:nth-child(3n),.info-tv-grid button:nth-child(3n+2){background:var(--tv-light);border:0;border-radius:16px;color:var(--tv-deep)}
+.info-tv-grid button:hover,.info-tv-grid button:focus-visible{background:var(--tv-beige);transform:scale(1.06);outline:0}
+.info-tile-icon{color:var(--tv-accent)}
+.tv-back{color:var(--tv-accent);background:#fff;border-radius:30px;padding:6px 14px}
+.tv-footer{background:var(--tv-light);border:0;color:var(--tv-deep);padding:6px 24px}
+.tv-detail{background:var(--tv-bg);color:var(--tv-ink)}.tv-detail p{color:var(--tv-deep)}
+.pair-screen{background:var(--tv-bg,#f7f3f0);font-family:'Poppins',sans-serif}
+.pair-screen-card{background:#fff;border-color:#e8e5df;color:#3b3121}
+.pair-screen h1{font-family:'Poppins',sans-serif;font-weight:700;color:#14100b}
+.pair-screen p,.pair-screen small{color:#3b3121}
+.pair-screen button{background:#766242;color:#fff;border-radius:30px}
+.pair-screen .demo-device-button{background:#e8e5df;color:#3b3121}
+.pair-code{color:#766242;font-weight:700}
+@media(min-width:1700px){.device-tv .tv-nav{height:auto;padding:12px 48px 24px}.device-tv .tv-nav nav button{font-size:28px;padding:20px 40px}.device-tv .tv-feature{height:600px;margin:0 -55px}}
+.station-art{height:82px;gap:4px}.station-art strong{font-size:15px}.compact-media .tv-card-copy{display:none}
