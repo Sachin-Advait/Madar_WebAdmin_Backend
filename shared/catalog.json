@@ -1118,7 +1118,8 @@
         },
         "streamRef": {
           "type": "string",
-          "title": "Stream reference / provider channel ID"
+          "title": "Stream URL or provider channel ID",
+          "description": "Paste the stream address (https://…, http://…, rtsp://…, or multicast udp://@239.1.1.1:1234 / rtp://@239.1.1.1:5000) or a provider reference."
         },
         "epgId": {
           "type": "string",
@@ -1391,7 +1392,8 @@
         },
         "stationRef": {
           "type": "string",
-          "title": "Audio stream reference"
+          "title": "Audio stream URL or reference",
+          "description": "Stream address (https, http, rtsp, udp:// or rtp://) or a provider reference."
         },
         "language": {
           "type": "string",

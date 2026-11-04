@@ -20,6 +20,26 @@ export function sourceUrl(value){
   return url.href;
 }
 
+/**
+ * Playable media address. HTTPS follows sourceUrl; LAN headends may also use
+ * http, rtsp and UDP/RTP multicast (udp://@239.1.1.1:1234). The API never
+ * fetches these: only the TV player opens them.
+ */
+export function mediaUrl(value){
+  check(typeof value==='string'&&value.length<=4096&&!/[\s\\]/.test(value),422,'Enter a valid stream address');
+  const scheme=value.slice(0,value.indexOf(':')).toLowerCase();
+  if(scheme==='https')return sourceUrl(value);
+  check(['http','rtsp','udp','rtp'].includes(scheme),422,'Stream address must start with https://, http://, rtsp://, udp:// or rtp://');
+  let url;try{url=new URL(value)}catch{check(false,422,'Enter a valid stream address')}
+  check(!url.password&&!url.hash,422,'Stream address must not contain a password or #fragment');
+  check(!url.username||scheme==='rtsp',422,'Only RTSP addresses may include a user name');
+  const host=url.hostname.toLowerCase().replace(/^\[|\]$/g,'');
+  check(host&&!['localhost','0.0.0.0','::','::1','metadata.google.internal'].includes(host)&&!host.endsWith('.localhost')&&!/^127\.|^169\.254\.|^fe[89ab][0-9a-f]:/i.test(host),422,'Loopback, link-local and metadata addresses are not valid streams');
+  if(['udp','rtp'].includes(scheme))check(url.port,422,'UDP/RTP streams need a port, for example udp://@239.1.1.1:1234');
+  // Keep VLC's "@" listen syntax intact; URL.href would drop the empty user part.
+  return value;
+}
+
 function decodeXml(value){
   const known={amp:'&',lt:'<',gt:'>',quot:'"',apos:"'"};
   return value.replace(/&([^;\s<&]+);|&/g,(match,entity)=>{
@@ -81,7 +101,7 @@ function parseM3u(text,warnings){
       if(attributes['tvg-logo']){pending.metadata.artworkUrl=sourceUrl(attributes['tvg-logo']);warnings.push(`Artwork for ${externalId} is recorded for review; upload the image before publication.`)}
       if(attributes.catchup||attributes['catchup-source'])warnings.push(`Catch-Up declarations for ${externalId} do not create playable recordings. Import explicit replay programmes with valid media URLs.`);
     }else if(line.startsWith('#'))continue;
-    else{check(pending,422,'Media URL without an EXTINF entry');pending.url=sourceUrl(line);records.push(pending);pending=null;check(records.length<=importLimits.items,422,'Import at most 500 records at a time')}
+    else{check(pending,422,'Media URL without an EXTINF entry');pending.url=mediaUrl(line);records.push(pending);pending=null;check(records.length<=importLimits.items,422,'Import at most 500 records at a time')}
   }
   check(!pending,422,'Playlist ends before a media URL');return records;
 }
@@ -112,11 +132,11 @@ function parseJson(text,warnings){
     const p={...r.payload,...common};
     for(const f of ['streamRef','stationRef','providerRef','videoRef','channelId','replayId','image','landscapeImage','portraitImage','customFields','bannerMode','bannerTitle','bannerTitleAr','bannerDescription','bannerDescriptionAr','focalX','focalY'])check(p[f]===undefined,422,`${f} is managed in MADAR; use mediaUrl, artworkUrl or channelExternalId`);
     if(r.kind==='replay')check(r.mediaUrl&&p.available===true&&p.startAt&&p.endAt&&r.channelExternalId,422,'Replay imports require actual mediaUrl, available:true, channelExternalId and availability startAt/endAt');
-    if(['channels','videos','radio'].includes(r.kind))check(r.mediaUrl,422,'Media imports require an HTTPS mediaUrl');
+    if(['channels','videos','radio'].includes(r.kind))check(r.mediaUrl,422,'Media imports require a mediaUrl');
     if(['programmes','replay'].includes(r.kind))check(safeId(r.channelExternalId),422,'Programme/replay imports require channelExternalId');
     if(r.kind==='programmes')check(!r.mediaUrl,422,'EPG programmes are metadata; import an explicit replay record for playable media');
     if(r.artworkUrl)warnings.push(`Artwork for ${r.externalId} is recorded for review; upload it before publication.`);
-    return {kind:r.kind,externalId:r.externalId,channelExternalId:r.channelExternalId,payload:p,...(r.mediaUrl?{url:sourceUrl(r.mediaUrl)}:{}),metadata:r.artworkUrl?{artworkUrl:sourceUrl(r.artworkUrl)}:{}};
+    return {kind:r.kind,externalId:r.externalId,channelExternalId:r.channelExternalId,payload:p,...(r.mediaUrl?{url:mediaUrl(r.mediaUrl)}:{}),metadata:r.artworkUrl?{artworkUrl:sourceUrl(r.artworkUrl)}:{}};
   });
 }
 export function parseSource(input){
