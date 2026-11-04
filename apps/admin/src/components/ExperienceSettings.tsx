@@ -7,16 +7,19 @@ import './experience-settings.css';
 
 export type HubGroup={id:string;title:string;titleAr:string;pages:string[]};
 export type Experience={orientation:'auto'|'landscape'|'portrait';historyMode:'off'|'session'|'device';recommendations:boolean;completionThreshold:number;hubGroups:HubGroup[]};
-export const hubPageNames:Record<string,string>={'info-meetings':'Meetings','info-queue':'Queue','info-notices':'Notices','info-alerts':'Priority alerts','info-services':'Services & information','info-visitor':'Visitor guide','info-events':'Events & training','info-media':'Media highlights'};
+export const hubPageNames:Record<string,string>={'info-meetings':'Meetings','info-queue':'Queue','info-notices':'Notices','info-alerts':'Priority alerts','info-services':'Services & information','info-visitor':'Visitor guide','info-events':'Events & training','info-media':'Media highlights','info-helpdesk':'Help Desk','info-tasks':'Daily tasks'};
 export const defaultGroups:HubGroup[]=[
  {id:'glance',title:'At a glance',titleAr:'نظرة سريعة',pages:['info-meetings','info-queue']},
  {id:'updates',title:'Updates',titleAr:'المستجدات',pages:['info-notices','info-alerts']},
  {id:'services',title:'Services',titleAr:'الخدمات',pages:['info-services','info-visitor']},
  {id:'explore',title:'Explore',titleAr:'استكشف',pages:['info-events','info-media']},
+ {id:'management',title:'Management',titleAr:'الإدارة',pages:['info-helpdesk','info-tasks']},
 ];
+/** Profiles saved before a tab existed get the new default tab appended. */
+function withAllGroups(groups:HubGroup[]):HubGroup[]{const used=new Set(groups.flatMap(g=>g.pages)),ids=new Set(groups.map(g=>g.id));return [...structuredClone(groups),...structuredClone(defaultGroups.filter(g=>g.pages.every(p=>!used.has(p))&&!ids.has(g.id)))]}
 export function experienceDefaults(profileType:string,value?:Partial<Experience>):Experience{
  const persistent=['employee','management'].includes(profileType);
- return {orientation:'auto',historyMode:persistent?'device':'off',recommendations:true,completionThreshold:.95,...value,hubGroups:value?.hubGroups?.length===4?structuredClone(value.hubGroups):structuredClone(defaultGroups)};
+ return {orientation:'auto',historyMode:persistent?'device':'off',recommendations:true,completionThreshold:.95,...value,hubGroups:value?.hubGroups?.length?withAllGroups(value.hubGroups):structuredClone(defaultGroups)};
 }
 export function ExperienceSettings({value,onChange,disabled=false}:{value:Experience;onChange:(value:Experience)=>void;disabled?:boolean}){
  function patch<K extends keyof Experience>(key:K,next:Experience[K]){onChange({...value,[key]:next})}
@@ -37,7 +40,7 @@ export function ExperienceSettings({value,onChange,disabled=false}:{value:Experi
    <label className="checkline experience-check"><input type="checkbox" checked={value.recommendations} onChange={e=>patch('recommendations',e.target.checked)}/><span>Show recommendations<small>Uses permitted content; device learning follows the history setting.</small></span></label>
   </div>
   <div className="experience-note"><ShieldCheck size={16}/> Preferences belong to the device, not an identified person. No camera, microphone or demographic profiling is used.</div>
-  <h4 className="experience-section-title"><PanelLeft size={17}/> Info Hub: four tabs, two sections each</h4>
+  <h4 className="experience-section-title"><PanelLeft size={17}/> Info Hub: five tabs, two sections each</h4>
   <p className="experience-note">Each tab opens directly onto its two sections. Changing a section swaps it with its previous slot. Audience permissions still apply; priority full-screen alerts remain independent of the selected tab.</p>
   <div className="hub-group-editor">{value.hubGroups.map((g,index)=><div className="hub-group-row" key={g.id}>
    <span className="hub-group-number">0{index+1}</span>

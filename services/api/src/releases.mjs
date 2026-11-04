@@ -3,6 +3,7 @@ import {uid,sha,check,allowedPage,catalog} from './domain.mjs';
 import {dynamicCatalog,contentPage} from './cms.mjs';
 import {playbackRevision} from './preferences.mjs';
 import {resolvedExperience} from './experience-config.mjs';
+import {odooSettings,odooPageAllowed} from './odoo.mjs';
 export const audit=(db,actor,action,entity,id,detail={})=>db.query('INSERT INTO audit(actor,action,entity,entity_id,detail) VALUES($1,$2,$3,$4,$5)',[actor,action,entity,id,JSON.stringify(detail)]);
 export async function queueDevice(db,screenId,releaseId){
  await db.query('SELECT id FROM screens WHERE id=$1 FOR UPDATE',[screenId]);
@@ -12,7 +13,8 @@ export async function queueDevice(db,screenId,releaseId){
 }
 export async function releaseProfile(db,profileId,reason){
  const pr=await one(db,'SELECT * FROM profiles WHERE id=$1 FOR UPDATE',[profileId]);check(pr,404,'Profile not found');const profile={...pr.payload,experience:resolvedExperience(pr.payload)};
- const pages={};for(const l of await rows(db,'SELECT * FROM layouts WHERE profile_id=$1 AND published IS NOT NULL ORDER BY page_key',[profileId]))if(allowedPage(profile,l.page_key))pages[l.page_key]=l.published;
+ const odoo=await odooSettings(db);
+ const pages={};for(const l of await rows(db,'SELECT * FROM layouts WHERE profile_id=$1 AND published IS NOT NULL ORDER BY page_key',[profileId]))if(allowedPage(profile,l.page_key)&&odooPageAllowed(odoo,profile.profileType,l.page_key))pages[l.page_key]=l.published;
  const content={};const assetIds=new Set(),artworkIds=new Set();const definitions=(await dynamicCatalog(db)).fieldDefinitions;
  for(const row of await rows(db,'SELECT kind,id,published,created_at,updated_at FROM resources WHERE published IS NOT NULL ORDER BY kind,id')){
    const p=row.published;if(p.status!=='published'||!p.visibleTo?.includes(profile.profileType)||!allowedPage(profile,contentPage[row.kind]))continue;
@@ -32,7 +34,7 @@ export async function releaseProfile(db,profileId,reason){
  const schedules=(await rows(db,'SELECT id,payload FROM schedules ORDER BY id')).map(r=>({...r.payload,id:r.id}));
  const masters=Object.groupBy((await rows(db,'SELECT kind,id,payload FROM masters ORDER BY kind,id')).filter(r=>r.payload.active).map(r=>({...r.payload,id:r.id,kind:r.kind})),r=>r.kind);
  const displayFields=Object.fromEntries(Object.entries(definitions).map(([k,d])=>[k,d.fields.filter(f=>f.showOnTv)]));
- const bundle={schemaVersion:1,experienceVersion:4,releaseId:id,version,profile,pages,content,assets,schedules,masters,displayFields,widgetSources:Object.fromEntries(Object.entries(catalog.widgets).map(([k,v])=>[k,v.source])),pageTitles:catalog.pages,createdAt:new Date().toISOString()};const text=JSON.stringify(bundle),digest=sha(text);
+ const bundle={schemaVersion:1,experienceVersion:5,releaseId:id,version,profile,pages,content,assets,schedules,masters,displayFields,widgetSources:Object.fromEntries(Object.entries(catalog.widgets).map(([k,v])=>[k,v.source])),pageTitles:catalog.pages,createdAt:new Date().toISOString()};const text=JSON.stringify(bundle),digest=sha(text);
  await db.query('INSERT INTO releases(id,profile_id,version,bundle,bundle_text,digest,reason) VALUES($1,$2,$3,$4,$5,$6,$7)',[id,profileId,version,text,text,digest,reason]);
  for(const screen of await rows(db,'SELECT id FROM screens WHERE profile_id=$1 AND enabled=true ORDER BY id',[profileId]))await queueDevice(db,screen.id,id);
  return {id,version,digest};

@@ -16,7 +16,7 @@ test('experience defaults protect public screens and support device orientation 
  assert.equal(resolvedExperience(p,{orientationOverride:'inherit'}).orientation,'landscape');
 });
 test('hub grouping keeps all eight sections exactly once and validates layout policy',()=>{
- const e=experienceDefaults(profile);assert.equal(e.hubGroups.flatMap(g=>g.pages).length,8);
+ const e=experienceDefaults(profile);assert.equal(e.hubGroups.flatMap(g=>g.pages).length,10);
  assert.throws(()=>validateExperience({...e,orientation:'rotate'},profile));
  assert.throws(()=>validateExperience({...e,completionThreshold:0.1},profile));
  assert.throws(()=>validateExperience({...e,historyMode:'all-users'},profile));
@@ -53,7 +53,7 @@ test('existing v3 publications upgrade once without publishing pending drafts',a
   await db.query("UPDATE resources SET draft=jsonb_set(draft,'{title}','\"Unapproved draft title\"') WHERE kind='videos' AND id='sample-videos-1'");
   await seed(db,{demo:false});
   const upgraded=await one(db,"SELECT bundle,version FROM releases WHERE profile_id='public' ORDER BY version DESC LIMIT 1");
-  assert.equal(upgraded.bundle.experienceVersion,4);
+  assert.equal(upgraded.bundle.experienceVersion,5);
   const video=upgraded.bundle.content.videos.find(r=>r.id==='sample-videos-1');
   assert.notEqual(video.title,'Unapproved draft title');assert.match(video.mediaRevision,/^[a-f0-9]{64}$/);
   await seed(db,{demo:false});

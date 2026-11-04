@@ -13,7 +13,9 @@
     "info-services": "Info Hub / Services & Information",
     "info-visitor": "Info Hub / Visitor Guide",
     "info-media": "Info Hub / Media Highlights",
-    "info-alerts": "Info Hub / Priority Alerts"
+    "info-alerts": "Info Hub / Priority Alerts",
+    "info-helpdesk": "Info Hub / Help Desk",
+    "info-tasks": "Info Hub / Daily Tasks"
   },
   "pageWidgets": {
     "home": [
@@ -25,7 +27,9 @@
       "announcements",
       "events_row",
       "radio_row",
-      "info_links"
+      "info_links",
+      "helpdesk_summary",
+      "task_summary"
     ],
     "live-tv": [
       "live_channel_row",
@@ -52,7 +56,10 @@
       "visitor_directory",
       "media_highlights",
       "priority_alerts",
-      "info_links"
+      "info_links",
+      "helpdesk_summary",
+      "task_summary",
+      "task_list"
     ],
     "info-meetings": [
       "meeting_summary",
@@ -81,6 +88,13 @@
     ],
     "info-alerts": [
       "priority_alerts"
+    ],
+    "info-helpdesk": [
+      "helpdesk_summary"
+    ],
+    "info-tasks": [
+      "task_summary",
+      "task_list"
     ]
   },
   "widgets": {
@@ -993,6 +1007,149 @@
       },
       "defaults": {
         "title": "Info Hub Shortcuts",
+        "limit": 8,
+        "displayStyle": "standard"
+      }
+    },
+    "helpdesk_summary": {
+      "type": "helpdesk_summary",
+      "label": "Help Desk Tickets",
+      "icon": "headset",
+      "source": "helpdesk",
+      "grid": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          },
+          "refreshSeconds": {
+            "type": "integer",
+            "minimum": 30,
+            "maximum": 600,
+            "default": 60
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Today's Help Desk Tickets",
+        "limit": 8,
+        "displayStyle": "standard",
+        "refreshSeconds": 60
+      }
+    },
+    "task_summary": {
+      "type": "task_summary",
+      "label": "Daily Task KPIs",
+      "icon": "list-checks",
+      "source": "tasks",
+      "grid": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          },
+          "refreshSeconds": {
+            "type": "integer",
+            "minimum": 30,
+            "maximum": 600,
+            "default": 60
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Today's Tasks",
+        "limit": 8,
+        "displayStyle": "standard",
+        "refreshSeconds": 60
+      }
+    },
+    "task_list": {
+      "type": "task_list",
+      "label": "Unfinished Tasks",
+      "icon": "list-todo",
+      "source": "tasks",
+      "grid": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Section title"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Maximum items",
+            "minimum": 1,
+            "maximum": 30,
+            "default": 8
+          },
+          "category": {
+            "type": "string",
+            "title": "Category filter (optional)"
+          },
+          "displayStyle": {
+            "type": "string",
+            "title": "Display style",
+            "enum": [
+              "standard",
+              "compact",
+              "featured"
+            ],
+            "default": "standard"
+          }
+        },
+        "additionalProperties": false
+      },
+      "defaults": {
+        "title": "Unfinished Tasks",
         "limit": 8,
         "displayStyle": "standard"
       }
@@ -2671,6 +2828,71 @@
             "x": 0,
             "y": 0,
             "w": 12,
+            "h": 4
+          }
+        }
+      ]
+    },
+    "info-helpdesk": {
+      "schemaVersion": 1,
+      "pageKey": "info-helpdesk",
+      "sections": [
+        {
+          "id": "helpdesk_summary-1",
+          "type": "helpdesk_summary",
+          "enabled": true,
+          "order": 0,
+          "props": {
+            "title": "Today's Help Desk Tickets",
+            "limit": 8,
+            "displayStyle": "standard",
+            "refreshSeconds": 60
+          },
+          "layout": {
+            "x": 0,
+            "y": 0,
+            "w": 6,
+            "h": 4
+          }
+        }
+      ]
+    },
+    "info-tasks": {
+      "schemaVersion": 1,
+      "pageKey": "info-tasks",
+      "sections": [
+        {
+          "id": "task_summary-1",
+          "type": "task_summary",
+          "enabled": true,
+          "order": 0,
+          "props": {
+            "title": "Today's Tasks",
+            "limit": 8,
+            "displayStyle": "standard",
+            "refreshSeconds": 60
+          },
+          "layout": {
+            "x": 0,
+            "y": 0,
+            "w": 6,
+            "h": 4
+          }
+        },
+        {
+          "id": "task_list-2",
+          "type": "task_list",
+          "enabled": true,
+          "order": 1,
+          "props": {
+            "title": "Unfinished Tasks",
+            "limit": 8,
+            "displayStyle": "standard"
+          },
+          "layout": {
+            "x": 6,
+            "y": 0,
+            "w": 6,
             "h": 4
           }
         }

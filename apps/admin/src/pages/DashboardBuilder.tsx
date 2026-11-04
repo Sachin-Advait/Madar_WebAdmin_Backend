@@ -9,7 +9,7 @@ import type {Catalog,LayoutSection,PageLayout,Role} from '../types';
 import {Button,Empty,ErrorBox,FormField,Loading,PageHeading,useFeedback} from '../components/Common';
 import {WidgetCard} from '../components/TVWidgets';
 
-const DASHBOARD_PAGES=['home','info-hub','info-meetings','info-queue'];
+const DASHBOARD_PAGES=['home','info-hub','info-meetings','info-queue','info-helpdesk','info-tasks'];
 export default function DashboardBuilder({catalog,role}:{catalog:Catalog;role:Role}){
  const [page,setPage]=useState('info-hub');const [profile,setProfile]=useState('management');const [sections,setSections]=useState<LayoutSection[]>([]);const [selectedId,setSelectedId]=useState<string|null>(null);const [dirty,setDirty]=useState(false);const [working,setWorking]=useState(false);
  const canEdit=role!=='viewer';const canPublish=role==='admin';const feedback=useFeedback();const client=useQueryClient();

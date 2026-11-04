@@ -6,6 +6,8 @@ import raw from '../../../shared/catalog.json' with {type:'json'};
 import {validateExperience} from './experience-config.mjs';
 export const catalog=structuredClone(raw);
 for(const layout of Object.values(catalog.defaults)){let y=0,half=false;for(const section of layout.sections){if(catalog.widgets[section.type].grid){section.layout={x:half?6:0,y,w:6,h:4};if(half)y+=4;half=!half}else{if(half)y+=4;half=false;section.layout={x:0,y,w:12,h:4};y+=4}}}
+// Daily Tasks: the KPI cards sit above a full-width, taller table of unfinished tasks.
+for(const s of catalog.defaults['info-tasks'].sections)s.layout=s.type==='task_list'?{x:0,y:3,w:12,h:6}:{x:0,y:0,w:12,h:3};
 export const uid=()=>crypto.randomUUID();
 export const secret=()=>crypto.randomBytes(32).toString('base64url');
 export const sha=value=>crypto.createHash('sha256').update(value).digest('hex');
