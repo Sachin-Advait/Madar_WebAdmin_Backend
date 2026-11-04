@@ -14,8 +14,8 @@ new Function('require','module','exports',compiled.outputFiles[0].text)(createRe
 const {AdminSectionLinks,AdminSectionJump}=module.exports;
 
 test('every admin destination has a valid bookmark and is distinct',()=>{
- assert.equal(navigationItems.length,38);
- assert.equal(new Set(navigationItems.map(item=>item.id)).size,38);
+ assert.equal(navigationItems.length,40);
+ assert.equal(new Set(navigationItems.map(item=>item.id)).size,40);
  for(const item of navigationItems)assert.equal(parseAdminHash(adminHash(item.id)),item.id);
 });
 
@@ -29,7 +29,7 @@ test('content and master bookmarks preserve collection names and reject unknown 
 test('the always-available section picker contains all groups and destinations',()=>{
  const html=renderToStaticMarkup(React.createElement(AdminSectionJump,{view:'reports',navigate:()=>{}}));
  assert.match(html,/aria-label="All admin sections"/);
- assert.equal((html.match(/<option /g)||[]).length,38);
+ assert.equal((html.match(/<option /g)||[]).length,40);
  assert.equal((html.match(/<optgroup /g)||[]).length,sections.length);
  assert.match(html,/<option value="reports" selected="">Reports &amp; Insights<\/option>/);
  for(const item of navigationItems)assert.ok(html.includes(`value="${item.id}"`));
@@ -37,7 +37,7 @@ test('the always-available section picker contains all groups and destinations',
 
 test('sidebar and drawer render real links with one accessible current page',()=>{
  const html=renderToStaticMarkup(React.createElement(AdminSectionLinks,{view:'content:videos',navigate:()=>{}}));
- assert.equal((html.match(/<a /g)||[]).length,38);
+ assert.equal((html.match(/<a /g)||[]).length,40);
  assert.equal((html.match(/aria-current="page"/g)||[]).length,1);
  assert.match(html,/href="#\/content%3Avideos" title="Video Library" aria-current="page"/);
  for(const item of navigationItems)assert.ok(html.includes(`href="${adminHash(item.id)}"`));

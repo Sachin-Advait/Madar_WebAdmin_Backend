@@ -14,6 +14,8 @@ const PageBuilder=React.lazy(()=>import('./pages/PageBuilder'));
 const DashboardBuilder=React.lazy(()=>import('./pages/DashboardBuilder'));
 const Preview=React.lazy(()=>import('./pages/TVPreview'));
 const ContentManager=React.lazy(()=>import('./pages/ContentManager'));
+const Notifications=React.lazy(()=>import('./pages/Notifications'));
+const BreakingNews=React.lazy(()=>import('./pages/BreakingNews'));
 import Profiles from './pages/Profiles';
 import Screens from './pages/Screens';
 import Schedules from './pages/Schedules';
@@ -70,6 +72,8 @@ function Studio({user,onLogout}:{user:User;onLogout:()=>void}){
   if(view.startsWith('master:'))return <Masters key={view} kind={view.slice(7)} catalog={catalog!} role={user.role}/>;
   if(view==='content-fields')return <ContentFields catalog={catalog!} role={user.role}/>;
   if(view==='reports')return <Reports role={user.role}/>;
+  if(view==='notifications')return <Notifications role={user.role}/>;
+  if(view==='breaking-news')return <BreakingNews role={user.role}/>;
   if(view==='delivery')return <Delivery role={user.role}/>;
   if(view==='integrations')return <Integrations role={user.role}/>;
   if(view==='assets')return <Integrations assets role={user.role}/>;
