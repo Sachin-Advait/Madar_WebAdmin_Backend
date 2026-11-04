@@ -12,6 +12,7 @@ const production=process.env.NODE_ENV==='production',demo=process.env.MADAR_DEMO
 if(production&&demo)throw Error('MADAR_DEMO must be disabled in production');
 if(production&&!process.env.APP_ORIGIN?.startsWith('https://'))throw Error('Production APP_ORIGIN must use HTTPS');
 if(production&&!process.env.REDIS_URL)throw Error('REDIS_URL is required for production Redis Streams delivery');
+if(demo&&process.env.DATABASE_URL)logger.warn('MADAR_DEMO=1 adds sample channels, videos, notices and four demo screens with public keys to this database. Set MADAR_DEMO=0 for real use and run scripts/remove-demo-data.mjs to clean it.');
 const db=await openDatabase();await seed(db,{demo});let redis=null,sub=null;
 if(process.env.REDIS_URL){const {createClient}=await import('redis');redis=createClient({url:process.env.REDIS_URL,disableOfflineQueue:true});redis.on('error',e=>logger.warn({message:e.message},'Redis unavailable'));await redis.connect()}
 const server=http.createServer(createApp({db,demo,redis,logger}));
