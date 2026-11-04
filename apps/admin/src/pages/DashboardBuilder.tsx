@@ -2,7 +2,7 @@ import React,{useEffect,useState} from 'react';
 import {useQuery,useQueryClient} from '@tanstack/react-query';
 import ReactGridLayout,{useContainerWidth,verticalCompactor} from 'react-grid-layout';
 import Form from '@rjsf/core';
-import validator from '@rjsf/validator-ajv8';
+import validator from '../form-validator';
 import {Grip,LayoutGrid,Plus,Save,Trash2,UploadCloud} from 'lucide-react';
 import {API} from '../api';
 import type {Catalog,LayoutSection,PageLayout,Role} from '../types';

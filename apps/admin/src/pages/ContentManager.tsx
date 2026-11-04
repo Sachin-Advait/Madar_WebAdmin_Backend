@@ -2,7 +2,7 @@ import React,{useState} from 'react';
 import BannerEditor,{bannerUiSchema} from '../components/BannerEditor';
 import {useQuery,useQueryClient} from '@tanstack/react-query';
 import Form from '@rjsf/core';
-import validator from '@rjsf/validator-ajv8';
+import validator from '../form-validator';
 import {ArrowLeft,ArrowUpRight,FileImage,Filter,ImagePlus,MoreHorizontal,Plus,Search,Trash2,UploadCloud} from 'lucide-react';
 import {API,request} from '../api';
 import type {Catalog,Resource,Role} from '../types';

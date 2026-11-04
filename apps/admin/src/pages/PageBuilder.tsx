@@ -4,7 +4,7 @@ import {DndContext,DragEndEvent,PointerSensor,KeyboardSensor,closestCenter,useSe
 import {SortableContext,arrayMove,sortableKeyboardCoordinates,useSortable,verticalListSortingStrategy} from '@dnd-kit/sortable';
 import {CSS} from '@dnd-kit/utilities';
 import Form from '@rjsf/core';
-import validator from '@rjsf/validator-ajv8';
+import validator from '../form-validator';
 import {ChevronDown,Copy,Eye,GripVertical,History,Layers3,Monitor,Plus,Save,Settings2,Trash2,UploadCloud,CheckCircle2} from 'lucide-react';
 import {API} from '../api';
 import type {Catalog,LayoutSection,PageLayout,Role} from '../types';
