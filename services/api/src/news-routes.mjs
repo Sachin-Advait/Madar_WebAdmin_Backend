@@ -55,12 +55,25 @@ export function parseFeed(xml){
   return {source:source.slice(0,120),items};
 }
 
+function reachReason(code){
+  if(['ENOTFOUND','EAI_AGAIN'].includes(code))return 'the server name could not be found, check DNS or internet access';
+  if(code==='ECONNREFUSED')return 'the server refused the connection';
+  if(code==='ECONNRESET')return 'the server closed the connection';
+  if(['ETIMEDOUT','UND_ERR_CONNECT_TIMEOUT'].includes(code))return 'the connection timed out';
+  if(['UNABLE_TO_VERIFY_LEAF_SIGNATURE','UNABLE_TO_GET_ISSUER_CERT_LOCALLY','SELF_SIGNED_CERT_IN_CHAIN','DEPTH_ZERO_SELF_SIGNED_CERT','CERT_HAS_EXPIRED','ERR_TLS_CERT_ALTNAME_INVALID'].includes(code))return `the site's HTTPS certificate was not accepted, ${code}`;
+  return '';
+}
+
 async function download(url){
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),10000);
   try{
     let r;
-    try{r=await fetch(url,{signal:controller.signal,redirect:'follow',headers:{Accept:'application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.5','User-Agent':'MADAR-News/4.0'}})}
-    catch(e){check(false,502,controller.signal.aborted?'The feed did not respond within 10 seconds':'Could not reach the feed address')}
+    try{r=await fetch(url,{signal:controller.signal,redirect:'follow',headers:{Accept:'application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.5','User-Agent':'Mozilla/5.0 (compatible; MADAR-News/4.0; +https://madar.local)'}})}
+    catch(e){
+      if(controller.signal.aborted)check(false,502,'The feed did not respond within 10 seconds');
+      const code=e?.cause?.code||e?.code||'',reason=reachReason(code)||e?.cause?.message||e?.message||'';
+      check(false,502,'Could not reach the feed address'+(reason?` (${reason}${code&&!reason.includes(code)?`, ${code}`:''})`:''));
+    }
     check(r.ok,502,`The feed returned HTTP ${r.status}`);
     const reader=r.body.getReader(),chunks=[];let size=0;
     for(;;){const {done,value}=await reader.read();if(done)break;size+=value.length;check(size<=2*1024*1024,413,'The feed is larger than 2 MB');chunks.push(value)}
