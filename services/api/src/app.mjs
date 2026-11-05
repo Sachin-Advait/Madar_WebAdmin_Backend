@@ -8,7 +8,7 @@ import {RedisStore} from 'rate-limit-redis';
 import multer from 'multer';
 import {fileTypeFromBuffer} from 'file-type';
 import sharp from 'sharp';
-import {mkdir,writeFile,readFile,unlink} from 'node:fs/promises';
+import {mkdir,writeFile,unlink} from 'node:fs/promises';
 import {createReadStream} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -38,6 +38,9 @@ export async function authenticateDevice(db,key){check(typeof key==='string'&&ke
 export function createApp({db,demo=false,odooFetch,redis=null,logger=null,assetsDir=process.env.ASSET_PATH||path.join(root,'data','assets'),production=process.env.NODE_ENV==='production'}={}){
  const app=express();app.disable('x-powered-by');if(process.env.TRUST_PROXY)app.set('trust proxy',Number(process.env.TRUST_PROXY));
  app.use(helmet({contentSecurityPolicy:{directives:{defaultSrc:["'self'"],scriptSrc:["'self'"],styleSrc:["'self'","'unsafe-inline'"],imgSrc:["'self'",'blob:','data:','https:'],mediaSrc:["'self'",'blob:','https:'],connectSrc:["'self'",'ws:','wss:','https:'],workerSrc:["'self'",'blob:'],objectSrc:["'none'"],upgradeInsecureRequests:production?[]:null}}}));
+ // One log line per API request so the console shows what the admin and TVs are doing.
+ // Media playback tokens are masked; set LOG_REQUESTS=0 to turn this off.
+ if(logger&&process.env.LOG_REQUESTS!=='0')app.use((req,res,next)=>{if(!req.path.startsWith('/api/')&&!req.path.startsWith('/socket.io'))return next();const started=Date.now();res.on('finish',()=>logger[res.statusCode>=500?'error':res.statusCode>=400?'warn':'info']({method:req.method,url:req.originalUrl.split('?')[0].replace(/^\/api\/media\/[^/]+/,'/api/media/***'),status:res.statusCode,ms:Date.now()-started},'request'));next()});
  app.use(express.json({limit:'1mb'}),cookieParser());
  const limiter=(prefix,max,windowMs=60000,options={})=>rateLimit({windowMs,limit:max,standardHeaders:'draft-8',legacyHeaders:false,passOnStoreError:true,...options,...(redis?{store:new RedisStore({prefix,sendCommand:(...args)=>redis.sendCommand(args)})}:{})});
  const failedDeviceAuth=limiter('madar:device-auth:',60);
@@ -144,7 +147,7 @@ export function createApp({db,demo=false,odooFetch,redis=null,logger=null,assets
   res.status(201).json({id,url:'/api/assets/'+id,mime,bytes:bytes.length,digest:sha(bytes)});
  }));
  app.get('/api/admin/assets',admin('viewer'),wrap(async(req,res)=>res.json(await rows(db,'SELECT * FROM assets ORDER BY created_at DESC LIMIT 250'))));
- app.get('/api/assets/:id',wrap(async(req,res)=>{const a=await one(db,'SELECT * FROM assets WHERE id=$1',[req.params.id]);check(a,404,'Asset not found');let authorized=false;const token=req.cookies.madar_session;if(token)authorized=!!await one(db,'SELECT u.id FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=$1 AND s.expires_at>now() AND u.active=true',[sha(token)]);if(!authorized){const s=await authenticateDevice(db,req.get('X-Screen-Key'));const r=await one(db,'SELECT bundle FROM releases WHERE id=$1',[s.desired_release]);authorized=!!r?.bundle.assets.some(x=>x.id===a.id)}check(authorized,403,'Asset is outside your published profile');res.set('Content-Type',a.mime).set('X-Content-Type-Options','nosniff').send(await readFile(path.join(assetsDir,a.id)))}));
+ app.get('/api/assets/:id',wrap(async(req,res)=>{const a=await one(db,'SELECT * FROM assets WHERE id=$1',[req.params.id]);check(a,404,'Asset not found');let authorized=false;const token=req.cookies.madar_session;if(token)authorized=!!await one(db,'SELECT u.id FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=$1 AND s.expires_at>now() AND u.active=true',[sha(token)]);if(!authorized){const s=await authenticateDevice(db,req.get('X-Screen-Key'));const r=await one(db,'SELECT bundle FROM releases WHERE id=$1',[s.desired_release]);authorized=!!r?.bundle.assets.some(x=>x.id===a.id)}check(authorized,403,'Asset is outside your published profile');res.set('Content-Type',a.mime).set('X-Content-Type-Options','nosniff');res.sendFile(path.join(assetsDir,a.id),{acceptRanges:true,cacheControl:false,lastModified:false},e=>{if(e&&!res.headersSent)res.status(e.status||500).json({detail:'Asset file missing'})})}));
  app.use('/api',(req,res)=>res.status(404).json({detail:'Endpoint not found'}));
  app.use(express.static(path.join(root,'apps/admin/dist')));app.get('/{*splat}',(req,res)=>res.sendFile(path.join(root,'apps/admin/dist/index.html')));
  app.use((e,req,res,next)=>{const status=e instanceof z.ZodError?422:e.status|| (e.code==='23505'?409:e.code==='LIMIT_FILE_SIZE'?413:500);if(status>=500)logger?.error({err:e},'Request failed');res.status(status).json({detail:status>=500&&!(e instanceof Problem)?'Service unavailable':e instanceof z.ZodError?e.issues.map(i=>i.path.join('.')+': '+i.message).join('; '):e.code==='23505'?'A record with this identifier already exists':e.message})});
