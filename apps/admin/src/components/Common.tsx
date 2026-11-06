@@ -27,3 +27,12 @@ export function useFeedback(){
  const node=message?<Notice text={message.text} kind={message.kind} onClose={()=>setMessage(null)}/>:null;
  return {success,error,node};
 }
+/** Copies text to the clipboard. navigator.clipboard only exists on HTTPS or localhost, so admins opened over
+ * plain HTTP on a LAN address fall back to a hidden textarea and document.execCommand('copy'). */
+export async function copyText(text:string):Promise<void>{
+ if(navigator.clipboard&&window.isSecureContext){try{await navigator.clipboard.writeText(text);return}catch{/* fall back below */}}
+ const area=document.createElement('textarea');area.value=text;area.setAttribute('readonly','');area.style.position='fixed';area.style.top='-1000px';area.style.opacity='0';
+ const active=document.activeElement as HTMLElement|null;document.body.appendChild(area);area.select();area.setSelectionRange(0,text.length);
+ let ok=false;try{ok=document.execCommand('copy')}catch{ok=false}finally{document.body.removeChild(area);active?.focus?.()}
+ if(!ok)throw new Error('Could not copy automatically. Copy this reference manually: '+text);
+}

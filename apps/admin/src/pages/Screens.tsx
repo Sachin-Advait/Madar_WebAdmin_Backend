@@ -5,7 +5,7 @@ import {Airplay,Copy,KeyRound,Monitor,Plus,RotateCcw,Save,ShieldCheck} from 'luc
 import {useForm} from 'react-hook-form';
 import {API,request} from '../api';
 import type {Catalog,Role,Screen} from '../types';
-import {Button,Card,Empty,ErrorBox,FormField,Loading,PageHeading,Status,useFeedback} from '../components/Common';
+import {Button,Card,Empty,ErrorBox,FormField,Loading,PageHeading,Status,useFeedback,copyText} from '../components/Common';
 import '../components/experience-settings.css';
 
 type ScreenForm={name:string;profileId:string;location:string;groupName:string;assignedPage:string;enabled:boolean;orientationOverride:'inherit'|'auto'|'landscape'|'portrait'};
@@ -62,7 +62,7 @@ export default function Screens({catalog,role}:{catalog:Catalog;role:Role}){
     <div className="form-actions"><Button variant="secondary" type="button" onClick={close}>Close</Button><Button type="submit" icon={Save} loading={busy}>{editing?'Save changes':'Register screen'}</Button></div>
    </fieldset></form>
    {editing&&role==='admin'&&<div className="screen-reset"><strong>Shared viewing state</strong><div>Clear resume points, learned interests and favourites for this device. The profile, content and registration remain available.</div><Button variant="secondary" icon={RotateCcw} disabled={busy} loading={resetting} onClick={resetPreferences}>Reset device history & favourites</Button></div>}
-   {secret&&<div className="secret-panel"><strong><KeyRound size={15}/> One-time screen credential</strong><code>{secret}</code><Button variant="secondary" icon={Copy} onClick={()=>navigator.clipboard.writeText(secret)}>Copy screen key</Button><small>The backend stores only its SHA-256 hash. Once this dialog closes, generate a new one if the key is lost.</small></div>}
+   {secret&&<div className="secret-panel"><strong><KeyRound size={15}/> One-time screen credential</strong><code>{secret}</code><Button variant="secondary" icon={Copy} onClick={()=>copyText(secret).then(()=>feedback.success('Screen key copied'),feedback.error)}>Copy screen key</Button><small>The backend stores only its SHA-256 hash. Once this dialog closes, generate a new one if the key is lost.</small></div>}
   </div></div>}{feedback.node}
  </>;
 }
