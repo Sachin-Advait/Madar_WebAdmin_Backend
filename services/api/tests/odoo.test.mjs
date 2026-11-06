@@ -4,7 +4,7 @@ import request from './inject-driver.mjs';
 import {openDatabase,one} from '../src/db.mjs';
 import {createApp} from '../src/app.mjs';
 import {seed} from '../src/seed.mjs';
-import {dayRange,odooUrl,odooClient,helpdeskSnapshot,taskSnapshot} from '../src/odoo.mjs';
+import {dayRange,weekRange,odooUrl,odooClient,helpdeskSnapshot,taskSnapshot} from '../src/odoo.mjs';
 
 // A small stand-in for Odoo's /jsonrpc endpoint (Odoo 17 shape: project.task has a state field).
 const calls=[];let odooDown=false;
@@ -40,6 +40,26 @@ test('today follows the configured time zone and is sent to Odoo in UTC',()=>{
   assert.throws(()=>odooUrl('ftp://odoo'),/http/);assert.throws(()=>odooUrl('http://169.254.169.254'),/metadata/);
 });
 
+test('this week starts on the configured day in the Odoo time zone',()=>{
+  // 2026-11-05 in Muscat is a Thursday.
+  const now=Date.parse('2026-11-04T21:30:00Z');
+  assert.deepEqual(weekRange('Asia/Muscat','sunday',now),{day:'2026-11-01',endDay:'2026-11-08',start:'2026-10-31 20:00:00',end:'2026-11-07 20:00:00'});
+  assert.equal(weekRange('Asia/Muscat','monday',now).day,'2026-11-02');
+  assert.equal(weekRange('Asia/Muscat','saturday',now).day,'2026-10-31');
+  // On the first day itself the week starts today.
+  assert.equal(weekRange('UTC','sunday',Date.parse('2026-11-01T09:00:00Z')).day,'2026-11-01');
+});
+
+test('weekly figures query Odoo from the start of the week',async()=>{
+  const client=odooClient(settings,{fetchImpl:fakeOdoo}),now=Date.parse('2026-11-04T08:00:00Z');calls.length=0;
+  await helpdeskSnapshot(client,settings,now,'week');
+  const count=calls.find(c=>c.args?.[3]==='helpdesk.ticket'&&c.args[4]==='search_count');
+  assert.ok(JSON.stringify(count.args[5]).includes('["create_date",">=","2026-10-31 20:00:00"]'));
+  await taskSnapshot(client,settings,now,20,'week');
+  const tasks=calls.find(c=>c.args?.[3]==='project.task'&&c.args[4]==='search_count');
+  assert.ok(JSON.stringify(tasks.args[5]).includes('["date_deadline","<","2026-11-07 20:00:00"]'));
+});
+
 test('Help Desk counts today\'s tickets and Daily Tasks lists the unfinished ones',async()=>{
   const client=odooClient(settings,{fetchImpl:fakeOdoo}),now=Date.parse('2026-11-04T08:00:00Z');
   assert.deepEqual(await helpdeskSnapshot(client,settings,now),{day:'2026-11-04',total:8,resolved:5,unresolved:3});
@@ -56,6 +76,11 @@ test('Help Desk counts today\'s tickets and Daily Tasks lists the unfinished one
 test('without Odoo settings the demo shows sample data; the API key is never returned',async()=>{
   let {body:ops}=await tv('/api/app/operations',managementTv).expect(200);
   assert.equal(ops.helpdesk.availability,'simulated');assert.equal(ops.tasks.items.length,4);
+  // Work & Support carries both periods in the TV's shape.
+  assert.equal(ops.work.availability,'simulated');
+  assert.deepEqual(ops.work.today.helpdesk,{total:24,resolved:17,pending:7});
+  assert.equal(ops.work.week.helpdesk.total,118);assert.equal(ops.work.week.tasks.pending,8);
+  assert.deepEqual(Object.keys(ops.work.today.tasks.items[0]),['title','owner','project','priority','due']);
   await send('/api/admin/odoo',{...settings,enabled:true,apiKey:''},'put').expect(422);
   await admin.put('/api/admin/odoo').send(settings).expect(403);
   const {body:saved}=await send('/api/admin/odoo',settings,'put').expect(200);
@@ -76,6 +101,11 @@ test('management TVs get live Odoo data; other profiles do not get the pages',as
   assert.equal(ops.helpdesk.availability,'connected');assert.equal(ops.helpdesk.resolved,5);assert.equal(ops.tasks.items[0].assignees[0],'Amal');
   const {body:pub}=await tv('/api/app/operations',publicTv).expect(200);
   assert.equal(pub.helpdesk,null);assert.equal(pub.tasks,null);
+  assert.equal(ops.work.availability,'connected');assert.deepEqual(ops.work.today.helpdesk,{total:8,resolved:5,pending:3});
+  assert.equal(ops.work.week.tasks.pending,1);
+  assert.deepEqual(ops.work.today.tasks.items[0],{title:'Call back VIP customer',owner:'Amal',project:'Customer Care',priority:'high',due:'2026-11-04T10:00:00Z'});
+  // Public TVs still get the tab, told that Odoo is not shared with their profile.
+  assert.equal(pub.work.availability,'unconnected');assert.match(pub.work.reason,/not shared/);
   const pages=async key=>{const {body}=await tv('/api/app/sync',key).expect(200);return Object.keys(JSON.parse(body.bundleText).pages)};
   assert.ok((await pages(managementTv)).includes('info-helpdesk'));assert.ok((await pages(managementTv)).includes('info-tasks'));
   assert.ok(!(await pages(publicTv)).includes('info-helpdesk'));
@@ -90,6 +120,7 @@ test('an unreachable Odoo is reported to the TV instead of failing the request',
   await send('/api/admin/odoo',{...settings,timezone:'UTC'},'put').expect(200);
   const {body:ops}=await tv('/api/app/operations',managementTv).expect(200);
   assert.equal(ops.helpdesk.availability,'error');assert.match(ops.helpdesk.error,/reach/);
+  assert.equal(ops.work.availability,'error');assert.match(ops.work.error,/reach/);
   odooDown=false;
   await send('/api/admin/odoo',{...settings,enabled:false},'put').expect(200);
   const {body:off}=await tv('/api/app/operations',managementTv).expect(200);

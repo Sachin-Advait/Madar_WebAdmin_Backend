@@ -8,7 +8,7 @@ import {check,Problem,profileTypes} from './domain.mjs';
 export const odooPages={helpdesk:'info-helpdesk',tasks:'info-tasks'};
 const pageKinds=Object.fromEntries(Object.entries(odooPages).map(([k,v])=>[v,k]));
 const serverZone=()=>Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC';
-const defaults={enabled:false,url:'',database:'',username:'',apiKey:'',timezone:'',taskScope:'deadline',helpdesk:true,tasks:true,profiles:['management']};
+const defaults={enabled:false,url:'',database:'',username:'',apiKey:'',timezone:'',taskScope:'deadline',weekStart:'sunday',helpdesk:true,tasks:true,profiles:['management']};
 const CACHE_MS=60000;
 
 const validZone=tz=>{try{new Intl.DateTimeFormat('en-US',{timeZone:tz});return true}catch{return false}};
@@ -36,11 +36,20 @@ function zoneOffset(ms,tz){
  return Date.UTC(+p.year,+p.month-1,+p.day,+p.hour%24,+p.minute,+p.second)-Math.floor(ms/1000)*1000;
 }
 const localMidnight=(y,m,d,tz)=>{const guess=Date.UTC(y,m-1,d);const first=guess-zoneOffset(guess,tz);return guess-zoneOffset(first,tz)};
+export const weekStarts=['sunday','monday','saturday'];
+const dateOf=(y,m,d)=>new Date(Date.UTC(y,m-1,d)).toISOString().slice(0,10);
 export function dayRange(tz,now=Date.now()){
  const day=new Intl.DateTimeFormat('en-CA',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(now));
  const [y,m,d]=day.split('-').map(Number);
  return {day,start:odooTime(localMidnight(y,m,d,tz)),end:odooTime(localMidnight(y,m,d+1,tz))};
 }
+/** This week in the configured time zone, from the chosen first day (Sunday for a Sunday to Thursday week). */
+export function weekRange(tz,weekStart='sunday',now=Date.now()){
+ const [y,m,d]=dayRange(tz,now).day.split('-').map(Number);
+ const first=d-(new Date(Date.UTC(y,m-1,d)).getUTCDay()-({sunday:0,monday:1,saturday:6}[weekStart]??0)+7)%7;
+ return {day:dateOf(y,m,first),endDay:dateOf(y,m,first+7),start:odooTime(localMidnight(y,m,first,tz)),end:odooTime(localMidnight(y,m,first+7,tz))};
+}
+const rangeFor=(s,period,now)=>period==='week'?weekRange(s.timezone||serverZone(),s.weekStart,now):dayRange(s.timezone||serverZone(),now);
 
 /** Minimal Odoo JSON-RPC client (works with Odoo 14 to 18). */
 export function odooClient(s,{fetchImpl=fetch,timeoutMs=10000}={}){
@@ -68,8 +77,8 @@ async function modelFields(client,model,app){
  catch(e){if(/doesn't exist|does not exist|KeyError|not found/i.test(e.message))throw new Problem(502,`The ${app} app is not installed in this Odoo database`);throw e}
 }
 
-export async function helpdeskSnapshot(client,s,now=Date.now()){
- const fields=await modelFields(client,'helpdesk.ticket','Help Desk'),range=dayRange(s.timezone||serverZone(),now);
+export async function helpdeskSnapshot(client,s,now=Date.now(),period='today'){
+ const fields=await modelFields(client,'helpdesk.ticket','Help Desk'),range=rangeFor(s,period,now);
  const today=[['create_date','>=',range.start],['create_date','<',range.end]];
  // OCA helpdesk_mgmt has a stored "closed" flag; Odoo Enterprise Help Desk closes tickets in folded stages.
  const closed=fields.closed?.store!==false&&fields.closed?[['closed','=',true]]:[['stage_id.fold','=',true]];
@@ -77,13 +86,13 @@ export async function helpdeskSnapshot(client,s,now=Date.now()){
  return {day:range.day,total,resolved,unresolved:Math.max(0,total-resolved)};
 }
 
-export async function taskSnapshot(client,s,now=Date.now(),limit=20){
- const fields=await modelFields(client,'project.task','Project'),range=dayRange(s.timezone||serverZone(),now);
+export async function taskSnapshot(client,s,now=Date.now(),limit=20,period='today'){
+ const fields=await modelFields(client,'project.task','Project'),range=rangeFor(s,period,now);
  let done,exclude=[];
  if(fields.state?.selection?.some(([v])=>v==='1_done')){done=['state','=','1_done'];exclude=[['state','!=','1_canceled']]}
  else if(fields.is_closed&&fields.is_closed.store!==false)done=['is_closed','=',true];
  else done=['stage_id.fold','=',true];
- const byDate=f=>fields[f]?.type==='date'?[[f,'=',range.day]]:[[f,'>=',range.start],[f,'<',range.end]];
+ const byDate=f=>fields[f]?.type==='date'?(range.endDay?[[f,'>=',range.day],[f,'<',range.endDay]]:[[f,'=',range.day]]):[[f,'>=',range.start],[f,'<',range.end]];
  const scope=s.taskScope==='created'?byDate('create_date'):byDate('date_deadline');
  const base=[...scope,...exclude];
  const [total,finished]=await Promise.all([client.call('project.task','search_count',[base]),client.call('project.task','search_count',[[...base,done]])]);
@@ -96,9 +105,11 @@ export async function taskSnapshot(client,s,now=Date.now(),limit=20){
  return {day:range.day,scope:s.taskScope,total,finished,unfinished:Math.max(0,total-finished),items};
 }
 
+/** Odoo sends deadlines as UTC "YYYY-MM-DD HH:MM:SS" or a bare date; the TV wants ISO 8601. */
+const odooDue=v=>{const d=String(v||'').trim();return d.length>10&&!d.includes('T')?d.replace(' ','T')+'Z':d};
 const sample={
- helpdesk:()=>({availability:'simulated',total:24,resolved:17,unresolved:7}),
- tasks:()=>({availability:'simulated',total:12,finished:8,unfinished:4,items:[
+ helpdesk:period=>period==='week'?{availability:'simulated',total:118,resolved:97,unresolved:21}:{availability:'simulated',total:24,resolved:17,unresolved:7},
+ tasks:period=>({availability:'simulated',...(period==='week'?{total:46,finished:38,unfinished:8}:{total:12,finished:8,unfinished:4}),items:[
   {id:1,name:'Prepare monthly operations report',project:'Management',assignees:['Operations team'],deadline:'',stage:'In Progress',priority:'1'},
   {id:2,name:'Review visitor feedback',project:'Customer Care',assignees:['Service desk'],deadline:'',stage:'New',priority:'0'},
   {id:3,name:'Approve training schedule',project:'Learning',assignees:['HR'],deadline:'',stage:'In Progress',priority:'0'},
@@ -108,29 +119,46 @@ const sample={
 export function createOdooService({db,demo=false,fetchImpl=(...a)=>fetch(...a),now=()=>Date.now()}){
  const cache=new Map(),status={};
  const load={helpdesk:helpdeskSnapshot,tasks:taskSnapshot};
- async function fresh(kind,s){
-  const data=await load[kind](odooClient(s,{fetchImpl}),s,now());
+ async function fresh(kind,s,period){
+  const client=odooClient(s,{fetchImpl}),data=kind==='tasks'?await taskSnapshot(client,s,now(),20,period):await helpdeskSnapshot(client,s,now(),period);
   status[kind]={lastSuccessAt:new Date(now()).toISOString(),lastError:''};
   return data;
  }
- async function snapshot(kind,s){
-  const signature=JSON.stringify(s),hit=cache.get(kind);
+ async function snapshot(kind,s,period='today'){
+  const key=kind+':'+period,signature=JSON.stringify(s),hit=cache.get(key);
   if(hit?.signature===signature&&(hit.pending||now()-hit.at<CACHE_MS))return hit.pending||hit.value;
-  const pending=fresh(kind,s).then(v=>{const value={...v,availability:'connected',updatedAt:new Date(now()).toISOString()};cache.set(kind,{signature,at:now(),value});return value},e=>{
+  const pending=fresh(kind,s,period).then(v=>{const value={...v,availability:'connected',updatedAt:new Date(now()).toISOString()};cache.set(key,{signature,at:now(),value});return value},e=>{
    status[kind]={...status[kind],lastError:e.message,lastErrorAt:new Date(now()).toISOString()};
    const value=hit?.signature===signature&&hit.value?.total!==undefined?{...hit.value,availability:'stale',error:e.message}:{availability:'error',error:e.message};
-   cache.set(kind,{signature,at:now(),value});return value});
-  cache.set(kind,{...hit,signature,at:hit?.at||0,pending});
+   cache.set(key,{signature,at:now(),value});return value});
+  cache.set(key,{...hit,signature,at:hit?.at||0,pending});
   return pending;
  }
  return {
   /** Operational data for a TV profile, cached for a minute per integration. */
-  async operational(kind,profile){
+  async operational(kind,profile,period='today'){
    const s=await odooSettings(db);
    if(profile&&!odooPageAllowed(s,profile.profileType,odooPages[kind]))return null;
-   if(!odooConfigured(s))return demo?sample[kind]():{availability:'unconnected'};
+   if(!odooConfigured(s))return demo?sample[kind](period):{availability:'unconnected'};
    if(!s.enabled||s[kind]===false)return {availability:'unconnected'};
-   return snapshot(kind,s);
+   return snapshot(kind,s,period);
+  },
+  /**
+   * The Info Hub Work & Support tab: Help Desk and Daily Tasks for today and
+   * this week, in the shape the TV renders. [kinds] are the sources the
+   * profile may show. A period or source with no usable data is left out.
+   */
+  async work(profile,kinds=['helpdesk','tasks']){
+   const jobs=['today','week'].flatMap(period=>kinds.map(kind=>({period,kind})));
+   const results=await Promise.all(jobs.map(j=>this.operational(j.kind,profile,j.period)));
+   const out={},states=[];let error='';
+   jobs.forEach((j,i)=>{
+    const d=results[i];if(!d)return;states.push(d.availability);if(d.error)error||=d.error;
+    if(['unconnected','error'].includes(d.availability))return;
+    (out[j.period]??={})[j.kind]=j.kind==='helpdesk'?{total:d.total,resolved:d.resolved,pending:d.unresolved}:{total:d.total,finished:d.finished,pending:d.unfinished,items:(d.items||[]).map(t=>({title:t.name,owner:(t.assignees||[]).join(', '),project:t.project||'',priority:String(t.priority||'0')==='0'?'normal':'high',due:odooDue(t.deadline)}))};
+   });
+   if(!Object.keys(out).length)return {availability:states.includes('error')?'error':'unconnected',...(error?{error}:{}),...(!states.length?{reason:'Odoo Help Desk and Daily Tasks are not shared with this profile'}:{})};
+   return {availability:states.includes('stale')?'stale':states.includes('simulated')?'simulated':'connected',...out};
   },
   status:()=>structuredClone(status),
   clear(){cache.clear()},
@@ -152,6 +180,7 @@ const settingsSchema=z.object({
  clearApiKey:z.boolean().optional(),
  timezone:z.string().trim().max(60).default(''),
  taskScope:z.enum(['deadline','created']),
+ weekStart:z.enum(weekStarts).default('sunday'),
  helpdesk:z.boolean(),
  tasks:z.boolean(),
  profiles:z.array(z.enum(profileTypes)).max(profileTypes.length),

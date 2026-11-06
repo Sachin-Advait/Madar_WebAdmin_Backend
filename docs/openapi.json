@@ -6578,7 +6578,9 @@
               "info-services",
               "info-visitor",
               "info-media",
-              "info-alerts"
+              "info-alerts",
+              "info-helpdesk",
+              "info-tasks"
             ]
           },
           "enabled": {
@@ -6750,7 +6752,8 @@
           },
           "streamRef": {
             "type": "string",
-            "title": "Stream reference / provider channel ID"
+            "title": "Stream URL or provider channel ID",
+            "description": "Paste the stream address (https://…, http://…, rtsp://…, or multicast udp://@239.1.1.1:1234 / rtp://@239.1.1.1:5000) or a provider reference."
           },
           "epgId": {
             "type": "string",
@@ -7293,7 +7296,8 @@
           },
           "stationRef": {
             "type": "string",
-            "title": "Audio stream reference"
+            "title": "Audio stream URL or reference",
+            "description": "Stream address (https, http, rtsp, udp:// or rtp://) or a provider reference."
           },
           "language": {
             "type": "string",
@@ -9175,30 +9179,47 @@
             "type": "array",
             "minItems": 4,
             "maxItems": 4,
+            "description": "The four Info Hub tabs. Titles and visibility are editable; sections are fixed per tab.",
             "items": {
               "type": "object",
               "required": [
                 "id",
-                "title",
-                "pages"
+                "title"
               ],
               "properties": {
                 "id": {
-                  "type": "string"
+                  "enum": [
+                    "live",
+                    "news",
+                    "services",
+                    "work"
+                  ]
                 },
                 "title": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 50
                 },
                 "titleAr": {
-                  "type": "string"
+                  "type": "string",
+                  "maxLength": 50
+                },
+                "enabled": {
+                  "type": "boolean",
+                  "default": true
                 },
                 "pages": {
                   "type": "array",
-                  "minItems": 2,
-                  "maxItems": 2,
                   "items": {
                     "type": "string"
-                  }
+                  },
+                  "readOnly": true
+                },
+                "banners": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "readOnly": true
                 }
               }
             }

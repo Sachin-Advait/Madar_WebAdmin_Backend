@@ -6,7 +6,7 @@ import {API,request} from '../api';
 import {adminHash} from '../navigation';
 import {PageHeading,Card,Status,useFeedback,Button,FormField,copyText} from '../components/Common';
 
-type OdooSettings={enabled:boolean;url:string;database:string;username:string;timezone:string;effectiveTimezone:string;taskScope:'deadline'|'created';helpdesk:boolean;tasks:boolean;profiles:string[];apiKeyConfigured:boolean;apiKeyFromEnvironment:boolean;configured:boolean;status?:Record<string,{lastSuccessAt?:string;lastError?:string}>};
+type OdooSettings={enabled:boolean;url:string;database:string;username:string;timezone:string;effectiveTimezone:string;taskScope:'deadline'|'created';weekStart:'sunday'|'monday'|'saturday';helpdesk:boolean;tasks:boolean;profiles:string[];apiKeyConfigured:boolean;apiKeyFromEnvironment:boolean;configured:boolean;status?:Record<string,{lastSuccessAt?:string;lastError?:string}>};
 type OdooForm=Omit<OdooSettings,'effectiveTimezone'|'apiKeyConfigured'|'apiKeyFromEnvironment'|'configured'|'status'>&{apiKey:string;clearApiKey:boolean};
 type TestResult={uid:number;helpdesk?:any;tasks?:any};
 const profiles=[['public','Public / Visitor'],['employee','Employee'],['management','Management'],['vip','VIP Lounge'],['signage','Dedicated Signage']];
@@ -38,7 +38,7 @@ export default function Integrations({assets=false,role}:{assets?:boolean;role:s
 function OdooPanel({settings,role,onSaved}:{settings?:OdooSettings;role:string;onSaved:()=>void}){
  const f=useFeedback(),client=useQueryClient(),canEdit=role==='admin';
  const [form,setForm]=useState<OdooForm|null>(null),[busy,setBusy]=useState(''),[result,setResult]=useState<TestResult|null>(null);
- useEffect(()=>{if(settings&&!form){const v=settings;setForm({enabled:v.enabled,url:v.url,database:v.database,username:v.username,timezone:v.timezone,taskScope:v.taskScope,helpdesk:v.helpdesk,tasks:v.tasks,profiles:v.profiles,apiKey:'',clearApiKey:false})}},[settings]);
+ useEffect(()=>{if(settings&&!form){const v=settings;setForm({enabled:v.enabled,url:v.url,database:v.database,username:v.username,timezone:v.timezone,taskScope:v.taskScope,weekStart:v.weekStart||'sunday',helpdesk:v.helpdesk,tasks:v.tasks,profiles:v.profiles,apiKey:'',clearApiKey:false})}},[settings]);
  if(!form||!settings)return null;
  const set=(patch:Partial<OdooForm>)=>setForm({...form,...patch});
  async function save(test=false){setBusy(test?'test':'save');try{
@@ -59,6 +59,7 @@ function OdooPanel({settings,role,onSaved}:{settings?:OdooSettings;role:string;o
      <FormField label="API key" help={settings.apiKeyFromEnvironment?'Using ODOO_API_KEY from the server environment.':settings.apiKeyConfigured?'A key is saved. Leave blank to keep it.':'Paste the key generated in Odoo.'}><div className="odoo-key"><KeyRound size={15}/><input type="password" autoComplete="new-password" placeholder={settings.apiKeyConfigured?'•••••••• saved':'Paste API key'} value={form.apiKey} onChange={e=>set({apiKey:e.target.value,clearApiKey:false})}/></div></FormField>
      <FormField label="Time zone for “today”" help={`Leave blank to use the server time zone (${settings.effectiveTimezone}).`}><input placeholder="Asia/Muscat" value={form.timezone} onChange={e=>set({timezone:e.target.value})}/></FormField>
      <FormField label="Daily tasks are" help="Which Odoo tasks count as today's tasks."><select value={form.taskScope} onChange={e=>set({taskScope:e.target.value as OdooForm['taskScope']})}><option value="deadline">Tasks with a deadline today</option><option value="created">Tasks created today</option></select></FormField>
+     <FormField label="Week starts on" help="Work & Support's This week view counts from this day, in the time zone above."><select value={form.weekStart} onChange={e=>set({weekStart:e.target.value as OdooForm['weekStart']})}><option value="sunday">Sunday (Sunday to Thursday week)</option><option value="monday">Monday</option><option value="saturday">Saturday</option></select></FormField>
     </div>
     <div className="odoo-toggles"><label className="checkline"><input type="checkbox" checked={form.helpdesk} onChange={e=>set({helpdesk:e.target.checked})}/><Headset size={15}/> Help Desk</label><label className="checkline"><input type="checkbox" checked={form.tasks} onChange={e=>set({tasks:e.target.checked})}/><ListChecks size={15}/> Daily tasks</label></div>
     <div className="access-pages"><strong>Show on these profiles (none ticked = all)</strong><div className="page-allow-list">{profiles.map(([id,label])=><label className="checkline" key={id}><input type="checkbox" checked={form.profiles.includes(id)} onChange={e=>set({profiles:e.target.checked?[...form.profiles,id]:form.profiles.filter(p=>p!==id)})}/>{label}</label>)}</div></div>

@@ -15,12 +15,32 @@ test('experience defaults protect public screens and support device orientation 
  assert.equal(resolvedExperience(p,{orientationOverride:'portrait'}).orientation,'portrait');
  assert.equal(resolvedExperience(p,{orientationOverride:'inherit'}).orientation,'landscape');
 });
-test('hub grouping keeps all eight sections exactly once and validates layout policy',()=>{
- const e=experienceDefaults(profile);assert.equal(e.hubGroups.flatMap(g=>g.pages).length,10);
+test('Info Hub has four tabs with fixed sections; admins rename and hide them',()=>{
+ const e=experienceDefaults(profile);
+ assert.deepEqual(e.hubGroups.map(g=>g.id),['live','news','services','work']);
+ assert.deepEqual(e.hubGroups.find(g=>g.id==='work').pages,['info-work']);
  assert.throws(()=>validateExperience({...e,orientation:'rotate'},profile));
  assert.throws(()=>validateExperience({...e,completionThreshold:0.1},profile));
  assert.throws(()=>validateExperience({...e,historyMode:'all-users'},profile));
- e.hubGroups[1].pages[0]=e.hubGroups[0].pages[0];assert.throws(()=>validateExperience(e,profile),/exactly once/);
+ // Titles and visibility are kept; sections cannot be moved between tabs.
+ const edited=structuredClone(e.hubGroups);edited[3].title='Operations';edited[0].enabled=false;edited[1].pages=['info-work'];
+ const saved=validateExperience({hubGroups:edited},profile).hubGroups;
+ assert.equal(saved[3].title,'Operations');assert.equal(saved[0].enabled,false);
+ assert.deepEqual(saved[1].pages,['info-notices','info-events','info-media']);
+ assert.throws(()=>validateExperience({hubGroups:edited.map(g=>({...g,enabled:false}))},profile),/at least one/);
+ assert.throws(()=>validateExperience({hubGroups:[...edited.slice(0,3),{...edited[3],id:'live'}]},profile),/once each/);
+ assert.throws(()=>validateExperience({hubGroups:edited.map((g,i)=>i?g:{...g,title:''})},profile),/title/);
+});
+test('profiles saved with the old five-tab layout move to the four tabs',()=>{
+ const old=[{id:'glance',title:'At a glance',titleAr:'',pages:['info-meetings','info-queue']},{id:'updates',title:'Updates',titleAr:'',pages:['info-notices','info-alerts']},{id:'services',title:'Services',titleAr:'',pages:['info-services','info-visitor']},{id:'explore',title:'Explore',titleAr:'',pages:['info-events','info-media']},{id:'management',title:'Management',titleAr:'',pages:['info-helpdesk','info-tasks']}];
+ const r=resolvedExperience({...profile,experience:{hubGroups:old}});
+ assert.deepEqual(r.hubGroups.map(g=>g.title),['Live Status','News & Events','Services & Guide','Work & Support']);
+ assert.ok(r.hubGroups.every(g=>g.enabled));
+ assert.deepEqual(validateExperience({hubGroups:old},profile).hubGroups.map(g=>g.id),['live','news','services','work']);
+ // Work & Support is hidden when the profile allows neither Help Desk nor Daily Tasks.
+ const limited=resolvedExperience({...profile,allowedSections:['home','info-hub','info-meetings']});
+ assert.equal(limited.hubGroups.find(g=>g.id==='work').enabled,false);
+ assert.equal(resolvedExperience({...profile,allowedSections:['info-tasks']}).hubGroups.find(g=>g.id==='work').enabled,true);
 });
 test('media artwork and focal points validate independently of orientation',()=>{
  const p={title:'A film',status:'draft',landscapeImage:'/art/horizon.svg',portraitImage:'/art/learning.svg',bannerMode:'override',focalX:0.7,focalY:0.3,tags:['nature','culture']};
@@ -53,7 +73,7 @@ test('existing v3 publications upgrade once without publishing pending drafts',a
   await db.query("UPDATE resources SET draft=jsonb_set(draft,'{title}','\"Unapproved draft title\"') WHERE kind='videos' AND id='sample-videos-1'");
   await seed(db,{demo:false});
   const upgraded=await one(db,"SELECT bundle,version FROM releases WHERE profile_id='public' ORDER BY version DESC LIMIT 1");
-  assert.equal(upgraded.bundle.experienceVersion,5);
+  assert.equal(upgraded.bundle.experienceVersion,6);
   const video=upgraded.bundle.content.videos.find(r=>r.id==='sample-videos-1');
   assert.notEqual(video.title,'Unapproved draft title');assert.match(video.mediaRevision,/^[a-f0-9]{64}$/);
   await seed(db,{demo:false});

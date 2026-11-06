@@ -5,31 +5,30 @@ import {request} from '../api';
 import {Card,ErrorBox,FormField,Loading} from './Common';
 import './experience-settings.css';
 
-export type HubGroup={id:string;title:string;titleAr:string;pages:string[]};
+export type HubGroup={id:'live'|'news'|'services'|'work';title:string;titleAr:string;enabled:boolean;pages:string[];banners?:string[]};
 export type Experience={orientation:'auto'|'landscape'|'portrait';historyMode:'off'|'session'|'device';recommendations:boolean;completionThreshold:number;hubGroups:HubGroup[]};
-export const hubPageNames:Record<string,string>={'info-meetings':'Meetings','info-queue':'Queue','info-notices':'Notices','info-alerts':'Priority alerts','info-services':'Services & information','info-visitor':'Visitor guide','info-events':'Events & training','info-media':'Media highlights','info-helpdesk':'Help Desk','info-tasks':'Daily tasks'};
+export const hubPageNames:Record<string,string>={'info-meetings':'Meeting rooms','info-queue':'Queue management','info-notices':'Official notices','info-alerts':'Priority alerts','info-services':'Services & information','info-visitor':'Visitor guide','info-events':'Events & training','info-media':'Media highlights','info-work':'Helpdesk and tasks, with Today / This week','info-helpdesk':'Help Desk','info-tasks':'Daily tasks'};
+/** The four TV Info Hub tabs. Titles and visibility are editable; the sections in each tab are fixed. */
 export const defaultGroups:HubGroup[]=[
- {id:'glance',title:'At a glance',titleAr:'نظرة سريعة',pages:['info-meetings','info-queue']},
- {id:'updates',title:'Updates',titleAr:'المستجدات',pages:['info-notices','info-alerts']},
- {id:'services',title:'Services',titleAr:'الخدمات',pages:['info-services','info-visitor']},
- {id:'explore',title:'Explore',titleAr:'استكشف',pages:['info-events','info-media']},
- {id:'management',title:'Management',titleAr:'الإدارة',pages:['info-helpdesk','info-tasks']},
+ {id:'live',title:'Live Status',titleAr:'الحالة المباشرة',enabled:true,pages:['info-meetings','info-queue'],banners:['info-alerts']},
+ {id:'news',title:'News & Events',titleAr:'الأخبار والفعاليات',enabled:true,pages:['info-notices','info-events','info-media']},
+ {id:'services',title:'Services & Guide',titleAr:'الخدمات والدليل',enabled:true,pages:['info-services','info-visitor']},
+ {id:'work',title:'Work & Support',titleAr:'العمل والدعم',enabled:true,pages:['info-work']},
 ];
-/** Profiles saved before a tab existed get the new default tab appended. */
-function withAllGroups(groups:HubGroup[]):HubGroup[]{const used=new Set(groups.flatMap(g=>g.pages)),ids=new Set(groups.map(g=>g.id));return [...structuredClone(groups),...structuredClone(defaultGroups.filter(g=>g.pages.every(p=>!used.has(p))&&!ids.has(g.id)))]}
+const legacyIds=['glance','updates','explore','management'];
+/** Keeps saved titles and visibility; a profile saved with the old five-tab layout starts from the four defaults. */
+function withAllGroups(groups?:Partial<HubGroup>[]):HubGroup[]{
+ const saved=Array.isArray(groups)&&!groups.some(g=>legacyIds.includes(String(g?.id)))?groups:[];
+ return defaultGroups.map(d=>{const g=saved.find(x=>x?.id===d.id)||{};return {...structuredClone(d),title:typeof g.title==='string'&&g.title.trim()?g.title:d.title,titleAr:typeof g.titleAr==='string'?g.titleAr:d.titleAr,enabled:g.enabled!==false}});
+}
 export function experienceDefaults(profileType:string,value?:Partial<Experience>):Experience{
  const persistent=['employee','management'].includes(profileType);
- return {orientation:'auto',historyMode:persistent?'device':'off',recommendations:true,completionThreshold:.95,...value,hubGroups:value?.hubGroups?.length?withAllGroups(value.hubGroups):structuredClone(defaultGroups)};
+ return {orientation:'auto',historyMode:persistent?'device':'off',recommendations:true,completionThreshold:.95,...value,hubGroups:withAllGroups(value?.hubGroups)};
 }
 export function ExperienceSettings({value,onChange,disabled=false}:{value:Experience;onChange:(value:Experience)=>void;disabled?:boolean}){
  function patch<K extends keyof Experience>(key:K,next:Experience[K]){onChange({...value,[key]:next})}
  function group(index:number,next:Partial<HubGroup>){patch('hubGroups',value.hubGroups.map((g,i)=>i===index?{...g,...next}:g))}
- function page(index:number,slot:number,next:string){
-  const groups=structuredClone(value.hubGroups),previous=groups[index].pages[slot];
-  // Move the selected section into this slot, preserving one occurrence of every section.
-  for(let i=0;i<groups.length;i++)for(let j=0;j<groups[i].pages.length;j++)if(groups[i].pages[j]===next)groups[i].pages[j]=previous;
-  groups[index].pages[slot]=next;patch('hubGroups',groups);
- }
+ const shown=value.hubGroups.filter(g=>g.enabled).length;
  return <fieldset className="experience-fieldset" disabled={disabled}>
   <legend><Monitor size={17}/> Screen layout & viewing</legend>
   <div className="experience-note">Landscape uses top navigation. Portrait uses a compact side rail, mirrored for Arabic. Automatic layout follows the app's available width and height.</div>
@@ -40,12 +39,16 @@ export function ExperienceSettings({value,onChange,disabled=false}:{value:Experi
    <label className="checkline experience-check"><input type="checkbox" checked={value.recommendations} onChange={e=>patch('recommendations',e.target.checked)}/><span>Show recommendations<small>Uses permitted content; device learning follows the history setting.</small></span></label>
   </div>
   <div className="experience-note"><ShieldCheck size={16}/> Preferences belong to the device, not an identified person. No camera, microphone or demographic profiling is used.</div>
-  <h4 className="experience-section-title"><PanelLeft size={17}/> Info Hub: five tabs, two sections each</h4>
-  <p className="experience-note">Each tab opens directly onto its two sections. Changing a section swaps it with its previous slot. Audience permissions still apply; priority full-screen alerts remain independent of the selected tab.</p>
-  <div className="hub-group-editor">{value.hubGroups.map((g,index)=><div className="hub-group-row" key={g.id}>
+  <h4 className="experience-section-title"><PanelLeft size={17}/> Info Hub tabs</h4>
+  <p className="experience-note">TVs on this profile show these four tabs in this order. Rename them or hide the ones this audience does not need. Work & Support shows Help Desk and Daily Tasks from Odoo with a Today / This week switch; it needs Help Desk or Daily Tasks in the allowed sections above, and this profile selected in Integrations → Odoo. Until then the tab shows a "no data" message. Priority full-screen alerts appear whichever tab is open.</p>
+  <div className="hub-group-editor">{value.hubGroups.map((g,index)=><div className={`hub-group-row${g.enabled?'':' is-hidden'}`} key={g.id}>
    <span className="hub-group-number">0{index+1}</span>
-   <div className="form-grid"><FormField label="Tab title"><input maxLength={50} required value={g.title} onChange={e=>group(index,{title:e.target.value})}/></FormField><FormField label="Arabic title"><input dir="rtl" maxLength={50} value={g.titleAr} onChange={e=>group(index,{titleAr:e.target.value})}/></FormField>
-   {g.pages.map((p,slot)=><FormField key={slot} label={`Section ${slot+1}`}><select value={p} onChange={e=>page(index,slot,e.target.value)}>{Object.entries(hubPageNames).map(([id,title])=><option key={id} value={id}>{title}</option>)}</select></FormField>)}</div>
+   <div className="form-grid">
+    <FormField label="Tab title"><input maxLength={50} required value={g.title} onChange={e=>group(index,{title:e.target.value})}/></FormField>
+    <FormField label="Arabic title"><input dir="rtl" maxLength={50} value={g.titleAr} onChange={e=>group(index,{titleAr:e.target.value})}/></FormField>
+    <label className="checkline experience-check"><input type="checkbox" checked={g.enabled} disabled={g.enabled&&shown===1} onChange={e=>group(index,{enabled:e.target.checked})}/><span>Show this tab on TVs<small>{g.enabled&&shown===1?'At least one tab must stay visible.':g.enabled?'Visible':'Hidden from TVs on this profile'}</small></span></label>
+    <div className="hub-group-sections"><span className="field-label">Sections</span><ul>{[...g.pages,...(g.banners||[])].map(p=><li key={p}>{hubPageNames[p]||p}</li>)}</ul></div>
+   </div>
   </div>)}</div>
  </fieldset>;
 }

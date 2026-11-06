@@ -169,15 +169,17 @@ The featured area does not start video merely because focus moved. Media cards h
   "recommendations": true,
   "completionThreshold": 0.95,
   "hubGroups": [
-    {"id":"glance","title":"At a glance","titleAr":"","pages":["info-meetings","info-queue"]},
-    {"id":"updates","title":"Updates","titleAr":"","pages":["info-notices","info-alerts"]},
-    {"id":"services","title":"Services","titleAr":"","pages":["info-services","info-visitor"]},
-    {"id":"explore","title":"Explore","titleAr":"","pages":["info-events","info-media"]}
+    {"id":"live","title":"Live Status","titleAr":"الحالة المباشرة","enabled":true,"pages":["info-meetings","info-queue"],"banners":["info-alerts"]},
+    {"id":"news","title":"News & Events","titleAr":"الأخبار والفعاليات","enabled":true,"pages":["info-notices","info-events","info-media"]},
+    {"id":"services","title":"Services & Guide","titleAr":"الخدمات والدليل","enabled":true,"pages":["info-services","info-visitor"]},
+    {"id":"work","title":"Work & Support","titleAr":"العمل والدعم","enabled":true,"pages":["info-work"]}
   ]
 }
 ```
 
-Completion threshold is 0.8–1.0. There must be four groups with unique IDs and two valid sections each; all eight Info Hub sections occur exactly once. Titles are at most 50 characters. The device field `orientationOverride` is `inherit`, `auto`, `landscape` or `portrait`; `inherit` keeps the profile setting. `/api/app/config` returns the resolved `experience` alongside the screen/profile and `preferencesEpoch`.
+Completion threshold is 0.8–1.0. The Info Hub has exactly four tabs: `live`, `news`, `services` and `work`, once each. Administrators set each tab's English and Arabic title (at most 50 characters) and whether it is shown; at least one tab must be shown. The sections inside each tab are fixed, and the server fills in `pages` and `banners`. A profile saved with the earlier five-tab layout (At a glance, Updates, Services, Explore, Management) is upgraded to the four default tabs. In the resolved experience, `work` is shown only when the profile allows `info-helpdesk` or `info-tasks`.
+
+`info-work` (Work & Support) is fed by `/api/app/operations`, whose `work` field holds Help Desk and Daily Tasks for `today` and `week`: `{availability, today:{helpdesk:{total,resolved,pending}, tasks:{total,finished,pending,items:[{title,owner,project,priority,due}]}}, week:{…}}`. This week starts on the Odoo integration's `weekStart` day (`sunday` by default, or `monday`/`saturday`) in its time zone. When Odoo is not connected or not shared with the profile, `work` is `{availability:"unconnected"}` (with a `reason`) or `{availability:"error", error}`, and the TV shows the tab with a no-data message. The device field `orientationOverride` is `inherit`, `auto`, `landscape` or `portrait`; `inherit` keeps the profile setting. `/api/app/config` returns the resolved `experience` alongside the screen/profile and `preferencesEpoch`.
 
 | History mode | Device behaviour | Server history |
 |---|---|---|

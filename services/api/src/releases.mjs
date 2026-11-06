@@ -34,7 +34,7 @@ export async function releaseProfile(db,profileId,reason){
  const schedules=(await rows(db,'SELECT id,payload FROM schedules ORDER BY id')).map(r=>({...r.payload,id:r.id}));
  const masters=Object.groupBy((await rows(db,'SELECT kind,id,payload FROM masters ORDER BY kind,id')).filter(r=>r.payload.active).map(r=>({...r.payload,id:r.id,kind:r.kind})),r=>r.kind);
  const displayFields=Object.fromEntries(Object.entries(definitions).map(([k,d])=>[k,d.fields.filter(f=>f.showOnTv)]));
- const bundle={schemaVersion:1,experienceVersion:5,releaseId:id,version,profile,pages,content,assets,schedules,masters,displayFields,widgetSources:Object.fromEntries(Object.entries(catalog.widgets).map(([k,v])=>[k,v.source])),pageTitles:catalog.pages,createdAt:new Date().toISOString()};const text=JSON.stringify(bundle),digest=sha(text);
+ const bundle={schemaVersion:1,experienceVersion:6,releaseId:id,version,profile,pages,content,assets,schedules,masters,displayFields,widgetSources:Object.fromEntries(Object.entries(catalog.widgets).map(([k,v])=>[k,v.source])),pageTitles:catalog.pages,createdAt:new Date().toISOString()};const text=JSON.stringify(bundle),digest=sha(text);
  await db.query('INSERT INTO releases(id,profile_id,version,bundle,bundle_text,digest,reason) VALUES($1,$2,$3,$4,$5,$6,$7)',[id,profileId,version,text,text,digest,reason]);
  for(const screen of await rows(db,'SELECT id FROM screens WHERE profile_id=$1 AND enabled=true ORDER BY id',[profileId]))await queueDevice(db,screen.id,id);
  return {id,version,digest};
