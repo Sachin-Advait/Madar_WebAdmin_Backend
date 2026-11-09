@@ -79,3 +79,12 @@ Run `npm run check`, then `npm run test:redis` with `TEST_REDIS_URL` pointing at
 Before operating real screens, complete the remaining acceptance work in `PRODUCTION_READINESS.md`: signed native build, target-device playback/remote checks, actual PostgreSQL/Redis deployment, backups/restore, provider integrations, monitoring, limits and desired authentication policy. Local media storage is a persistent-volume baseline; multi-host API scaling requires shared/object media storage and equivalent authenticated asset delivery. Do not assume local disk uploads are shared across replicas.
 
 Authenticated TV requests have a separate per-screen quota (default `DEVICE_RATE_LIMIT=180` per minute), so multiple TVs behind the same router do not share the general IP allowance. `API_RATE_LIMIT=600` controls other API traffic. Failed device authentication remains rate-limited by IP. Review limits during the real fleet load test.
+
+## SpaceHub and ServeIQ (Info Hub meeting rooms and queues)
+
+Admin > Integrations has a panel for each. When a connector is turned on, `/api/app/operations` serves its data as `meeting` (SpaceHub) or `queue` (ServeIQ), ahead of pushed snapshots, managed records and sample data. MADAR TVs need no extra configuration.
+
+- **SpaceHub**: enter the API address (for example `https://host/spacehub/api`) and a SpaceHub user with the `DISPLAY` role. MADAR logs in with `POST /auth/login`, keeps the token until shortly before it expires (logging in again on 401/403), and reads `GET /tv-display`. Rooms carry `current` and `next` meetings; upcoming bookings fill `schedule`. Public, VIP and Signage screens see meeting titles as "Reserved". The password is never returned by the admin API; `SPACEHUB_PASSWORD` can supply it instead.
+- **ServeIQ**: enter the API address (for example `https://host/serveiq/api`) and the branch ID. MADAR reads the public `GET /tv-display/branch/{branchId}`: latest calls become `calls`, counter tiles become `counters` (`CALLING`/`SERVING` → `serving`, `IDLE` → `available`, `PAUSED` → `paused`, `CLOSED` → `closed`), plus `waiting` and `servedToday`.
+
+Both are cached for 15 seconds. If a source fails, the last good data stays on screen for 90 seconds marked `stale`, then the TV shows its no-data message. Implementation and field mapping: `services/api/src/display-connectors.mjs`.
