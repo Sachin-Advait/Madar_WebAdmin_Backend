@@ -139,7 +139,9 @@ export function createOdooService({db,demo=false,fetchImpl=(...a)=>fetch(...a),n
   async operational(kind,profile,period='today'){
    const s=await odooSettings(db);
    if(profile&&!odooPageAllowed(s,profile.profileType,odooPages[kind]))return null;
-   if(!odooConfigured(s))return demo?sample[kind](period):{availability:'unconnected'};
+   // ODOO_SAMPLE_DATA=1 shows sample Help Desk and Tasks figures (marked
+   // SAMPLE on the TV) until Odoo is connected, without the rest of demo mode.
+   if(!odooConfigured(s))return demo||process.env.ODOO_SAMPLE_DATA==='1'?sample[kind](period):{availability:'unconnected'};
    if(!s.enabled||s[kind]===false)return {availability:'unconnected'};
    return snapshot(kind,s,period);
   },
