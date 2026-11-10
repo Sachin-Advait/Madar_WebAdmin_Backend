@@ -6,6 +6,7 @@ import {
   CalendarRange,
   ChartColumn,
   Clapperboard,
+  History,
   CloudDownload,
   ConciergeBell,
   DoorOpen,
@@ -88,6 +89,7 @@ export const sections = [
       { id: "assets", label: "Media Assets", icon: FolderOpen },
       { id: "content:channels", label: "Live TV Channels", icon: Tv },
       { id: "content:videos", label: "Video Library", icon: Clapperboard },
+      { id: "content:replay", label: "Replay Programmes", icon: History },
       { id: "content:radio", label: "Radio Stations", icon: Radio },
       {
         id: "content:featured",

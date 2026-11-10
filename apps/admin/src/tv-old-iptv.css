@@ -96,3 +96,5 @@
 [dir=rtl] .tv-replay-when{border-left:0;border-right:1px solid var(--tv-light);padding-left:0;padding-right:16px}
 [dir=rtl] .tv-replay-row{text-align:right}
 @media(max-width:760px){.tv-replay-hero{grid-template-columns:1fr}.tv-replay-hero-art{grid-column:1;grid-row:1;min-height:160px}.tv-replay-hero-copy{grid-row:2}.tv-replay-row{grid-template-columns:90px minmax(0,1fr)}.tv-replay-thumb{width:90px;height:52px}.tv-replay-when{display:none}}
+.tv-replay-row.is-show .tv-replay-thumb{background:#fff;border:1px solid var(--tv-light)}
+.tv-replay-row.is-show .tv-replay-thumb img{object-fit:contain;padding:6px}

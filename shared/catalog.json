@@ -237,7 +237,7 @@
     },
     "replay_channels": {
       "type": "replay_channels",
-      "label": "Catch-Up Channels",
+      "label": "Replay Programmes",
       "icon": "history",
       "source": "replay",
       "grid": false,
@@ -273,7 +273,7 @@
         "additionalProperties": false
       },
       "defaults": {
-        "title": "Catch-Up Channels",
+        "title": "Programmes you missed",
         "limit": 8,
         "displayStyle": "standard"
       }
@@ -1165,7 +1165,7 @@
       "icon": "clapperboard"
     },
     "replay": {
-      "label": "Catch-Up Sources",
+      "label": "Replay Programmes",
       "icon": "history"
     },
     "radio": {
@@ -1288,7 +1288,7 @@
         },
         "catchupEnabled": {
           "type": "boolean",
-          "title": "Catch-Up supported"
+          "title": "Replay supported"
         }
       },
       "additionalProperties": true
@@ -2415,7 +2415,7 @@
           "enabled": true,
           "order": 0,
           "props": {
-            "title": "Catch-Up Channels",
+            "title": "Programmes you missed",
             "limit": 8,
             "displayStyle": "standard"
           },

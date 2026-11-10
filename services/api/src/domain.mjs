@@ -57,6 +57,11 @@ for(const kind of ['channels','videos','replay','radio','featured','programmes']
  tags:{type:'array',title:'Interest tags',items:{type:'string',minLength:1,maxLength:50},uniqueItems:true,maxItems:12}
 });
 for(const kind of ['videos','replay'])catalog.resourceSchemas[kind].properties.mediaRevision={type:'string',title:'Media version (change when provider replaces the video)',maxLength:100};
+// Replay programmes: a show that already aired on a channel (e.g. yesterday's news), played from the provider's catch-up link or an uploaded recording.
+Object.assign(catalog.resourceSchemas.replay.properties.channelId,{title:'Channel'});
+Object.assign(catalog.resourceSchemas.replay.properties.providerRef,{title:'Provider catch-up link (leave empty when you upload the recording)'});
+Object.assign(catalog.resourceSchemas.replay.properties.available,{title:'Ready to play on TVs',default:true});
+catalog.resourceSchemas.replay.properties.videoRef={type:'string',title:'Recorded video (MP4)'};
 Object.assign(catalog.resourceSchemas.replay.properties,{eventStart:{type:'string',title:'Original broadcast start (ISO datetime)'},eventEnd:{type:'string',title:'Original broadcast end (ISO datetime)'},durationSeconds:{type:'integer',minimum:0,title:'Duration in seconds'},language:{type:'string',title:'Language'}});
 const ajv=new Ajv({allErrors:true,strict:false});addFormats(ajv);
 const validators=Object.fromEntries(Object.entries(catalog.resourceSchemas).map(([k,s])=>[k,ajv.compile(s)]));

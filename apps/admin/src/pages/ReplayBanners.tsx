@@ -34,7 +34,8 @@ import "./replay-banners.css";
 
 /**
  * Banners → Replay: "featured programme" banners shown at the top of the TV
- * Replay page. Each one points at a video in the Video Library; its title,
+ * Replay page. Each one points at a Video Library video or a replay programme
+ * (a channel show that already aired); its title,
  * category, description, duration and artwork come from that video and can
  * be overridden. Stored as Featured Banners with placement "replay".
  */
@@ -138,10 +139,48 @@ export default function ReplayBanners({
     queryKey: ["resources", "featured"],
     queryFn: () => API.resources("featured"),
   });
-  const { data: programmes = [] } = useQuery({
+  const { data: videos = [] } = useQuery({
     queryKey: ["resources", "videos"],
     queryFn: () => API.resources("videos"),
   });
+  const { data: shows = [] } = useQuery({
+    queryKey: ["resources", "replay"],
+    queryFn: () => API.resources("replay"),
+  });
+  const { data: channels = [] } = useQuery({
+    queryKey: ["resources", "channels"],
+    queryFn: () => API.resources("channels"),
+  });
+  // Both kinds can be featured: videos and channel shows that already aired.
+  const programmes = useMemo<Resource[]>(
+    () => [
+      ...shows.map((p) => ({ ...p, _kind: "replay" })),
+      ...videos.map((p) => ({ ...p, _kind: "videos" })),
+    ],
+    [shows, videos],
+  );
+  const channelName = (p?: Resource) =>
+    p?._kind === "replay"
+      ? channels.find((c) => c.id === p.channelId)?.title || "Channel show"
+      : "";
+  const aired = (p?: Resource) =>
+    p?._kind === "replay" && p.eventStart
+      ? new Date(p.eventStart).toLocaleString(undefined, {
+          day: "numeric",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "";
+  const describe = (p?: Resource) =>
+    [
+      channelName(p),
+      p?.category || (p?._kind === "replay" ? "" : "Video"),
+      minutes(p) ? `${minutes(p)} min` : "",
+      aired(p) ? `aired ${aired(p)}` : "",
+    ]
+      .filter(Boolean)
+      .join(" · ");
   const { data: profiles = [] } = useQuery({
     queryKey: ["profiles"],
     queryFn: API.profiles,
@@ -172,7 +211,7 @@ export default function ReplayBanners({
   );
   const matches = programmes
     .filter((p) =>
-      `${p.title} ${p.category || ""} ${p.description || ""}`
+      `${p.title} ${p.category || ""} ${p.description || ""} ${channelName(p)}`
         .toLowerCase()
         .includes(query.trim().toLowerCase()),
     )
@@ -238,7 +277,7 @@ export default function ReplayBanners({
     setBusy(true);
     const payload: Record<string, unknown> = {
       placement: "replay",
-      targetType: "video",
+      targetType: programme._kind === "replay" ? "replay" : "video",
       targetId: draft.targetId,
       bannerLabel: draft.bannerLabel.trim() || "Featured Replay",
       title: draft.title.trim() || programme.title,
@@ -306,7 +345,7 @@ export default function ReplayBanners({
         <PageHeading
           eyebrow="BANNERS / REPLAY"
           title={editing ? "Edit featured programme" : "Add featured programme"}
-          subtitle="Feature a Video Library video at the top of the TV Replay page."
+          subtitle="Feature a video or a channel show at the top of the TV Replay page."
         >
           <Button
             variant="secondary"
@@ -323,7 +362,7 @@ export default function ReplayBanners({
                 <span>1</span>
                 <div>
                   <h3>Video</h3>
-                  <p>Search the Video Library and pick one.</p>
+                  <p>Search your videos and channel shows and pick one.</p>
                 </div>
               </div>
               {programme ? (
@@ -338,13 +377,15 @@ export default function ReplayBanners({
                   <div className="rb-picked-text">
                     <strong>{programme.title}</strong>
                     <small>
-                      {programme.category || "No category"}
-                      {mins ? ` · ${mins} min` : ""}
+                      {describe(programme)}
                     </small>
                     {programme.status !== "published" && (
                       <small className="rb-warn">
-                        This video is not published yet. Publish it in the
-                        Video Library before publishing the banner.
+                        This is not published yet. Publish it in
+                        {programme._kind === "replay"
+                          ? " Replay Programmes"
+                          : " Video Library"}{" "}
+                        before publishing the banner.
                       </small>
                     )}
                   </div>
@@ -362,7 +403,7 @@ export default function ReplayBanners({
                     <Search size={17} />
                     <input
                       autoFocus
-                      placeholder="Search videos by title or category…"
+                      placeholder="Search by title, channel or category…"
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                     />
@@ -386,8 +427,7 @@ export default function ReplayBanners({
                         <span>
                           <strong>{p.title}</strong>
                           <small>
-                            {p.category || "No category"}
-                            {minutes(p) ? ` · ${minutes(p)} min` : ""}
+                            {describe(p)}
                           </small>
                         </span>
                         <Status value={p.status} />
@@ -395,8 +435,8 @@ export default function ReplayBanners({
                     ))}
                     {!matches.length && (
                       <Empty
-                        title="No videos found"
-                        description="Add videos under Content Management → Video Library."
+                        title="Nothing found"
+                        description="Add videos in Video Library, or channel shows in Replay Programmes."
                       />
                     )}
                   </div>
@@ -450,8 +490,13 @@ export default function ReplayBanners({
               </FormField>
               <div className="rb-meta">
                 <span>
-                  <Monitor size={14} /> Category:{" "}
-                  <b>{programme?.category || "—"}</b>
+                  <Monitor size={14} />{" "}
+                  {programme?._kind === "replay" ? "Channel" : "Category"}:{" "}
+                  <b>
+                    {(programme?._kind === "replay"
+                      ? channelName(programme)
+                      : programme?.category) || "—"}
+                  </b>
                 </span>
                 <span>
                   <Clock3 size={14} /> Duration:{" "}
@@ -644,8 +689,8 @@ export default function ReplayBanners({
                   <div className="rb-tv-eyebrow">
                     <span>
                       {(draft.bannerLabel || "Featured Replay").toUpperCase()}
-                      {programme?.category
-                        ? ` · ${programme.category.toUpperCase()}`
+                      {channelName(programme) || programme?.category
+                        ? ` · ${(channelName(programme) || programme?.category || "").toUpperCase()}`
                         : ""}
                       {mins ? ` · ${mins} MIN` : ""}
                     </span>
@@ -781,7 +826,7 @@ export default function ReplayBanners({
                             <strong>{b.title}</strong>
                             <small>
                               {b.bannerLabel || "Featured Replay"} ·{" "}
-                              {p?.category || "Video"}
+                              {describe(p) || "Video"}
                             </small>
                           </div>
                         </div>

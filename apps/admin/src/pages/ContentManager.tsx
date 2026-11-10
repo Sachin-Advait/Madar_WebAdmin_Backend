@@ -10,7 +10,7 @@ import {Button,Card,Empty,ErrorBox,Loading,PageHeading,Status,useFeedback} from 
 
 const descriptions:Record<string,string>={
  channels:'Manage channel metadata, logos, EPG mappings and streaming references.',videos:'Curate video-on-demand content that the existing Flutter TV app can display.',
- replay:'Configure the channel replay sources supported by your TV provider. Personal recordings are excluded.',
+ replay:'Shows that already aired on your channels, such as yesterday\'s news. Each one plays from your provider\'s catch-up link or an MP4 recording you upload, and appears on the TV under Replay → Programmes you missed.',
  radio:'Manage listening stations, artwork, categories and stream references.',
  featured:'Select and prioritize existing content for Home hero banners.',
  notices:'Create scheduled bilingual notices and organizational messages.',
@@ -41,7 +41,7 @@ export default function ContentManager({kind,catalog,role,filter,tabs}:{kind:str
    editorSchema.properties.targetId={type:'string',title:'Select existing '+target+' item',oneOf:ref};
  }
  if(kind==='featured'){editorSchema.properties.targetType.enum=editorSchema.properties.targetType.enum.filter((t:string)=>t!=='replay');for(const k of ['placement','bannerLabel','screenGroups'])delete editorSchema.properties[k]}
- if(kind==='replay')editorSchema.properties.channelId={type:'string',title:'Replay enabled channel',oneOf:linkChoice(channelOptions)};
+ if(kind==='replay')editorSchema.properties.channelId={type:'string',title:'Channel',oneOf:linkChoice(channelOptions)};
  if(kind==='events')editorSchema.properties.videoId={type:'string',title:'Related published video',oneOf:linkChoice(videoOptions)};
  if(kind==='media')editorSchema.properties.targetVideoId={type:'string',title:'Related published video',oneOf:linkChoice(videoOptions)};
 
@@ -65,6 +65,6 @@ export default function ContentManager({kind,catalog,role,filter,tabs}:{kind:str
  return <><PageHeading eyebrow="CONTENT MANAGEMENT" title={label} subtitle={descriptions[kind]||'Manage content catalog.'}><Button icon={Plus} onClick={startNew} disabled={!canEdit}>Add {label.endsWith('s')?'item':'new item'}</Button></PageHeading>{tabs}
  <div className="bulk-upload"><label>Import up to 100 content records from a JSON array <input type="file" accept="application/json,.json" disabled={!canEdit} onChange={e=>{const f=e.target.files?.[0];if(f)importItems(f)}}/></label></div><Card className="content-list-card"><div className="list-toolbar"><div className="searchbox"><Search size={17}/><input placeholder={`Search ${label.toLowerCase()}…`} value={search} onChange={e=>setSearch(e.target.value)}/></div><div className="select-wrap"><Filter size={16}/><select value={statusFilter} onChange={e=>setStatusFilter(e.target.value)}><option value="all">All statuses</option><option value="published">Published</option><option value="draft">Draft</option><option value="review">Awaiting approval</option><option value="disabled">Disabled</option></select></div><span className="total-count">{filtered.length} items</span></div>
  {isLoading?<Loading/>:error?<ErrorBox error={error}/>:filtered.length?<div className="responsive-table"><table className="table"><thead><tr><th>CONTENT</th><th>CATEGORY</th><th>STATUS</th><th>VISIBILITY</th><th>UPDATED</th><th></th></tr></thead><tbody>{filtered.map(item=><tr key={item.id}><td><div className="content-name"><div className="table-thumb">{item.image?<img src={item.image} alt=""/>:<FileImage size={18}/>}</div><div><strong>{item.title}</strong><small>{item.description||'No description'}</small></div></div></td><td>{item.category||'—'}</td><td><Status value={item.status}/></td><td><span className="table-muted">{item.visibleTo?.length??0} profiles</span></td><td><span className="table-muted">{item.updatedAt?new Date(item.updatedAt).toLocaleDateString():'—'}</span></td><td><div className="action-cell"><button className="row-action" onClick={()=>startEdit(item)}>Edit <ArrowUpRight size={14}/></button><button className="icon-btn hover-danger" title="Delete" disabled={!canEdit} onClick={()=>deleteItem(item)}><Trash2 size={16}/></button></div></td></tr>)}</tbody></table></div>:<Empty title="No matching content" description="Add an item or change your search filters."/>}
- </Card>{kind==='replay'&&<div className="info-strip"><strong>Provider replay only:</strong>&nbsp; Provider-supported replay and retention controls; no personal PVR, recording scheduler or recording buttons.</div>}{feedback.node}</>
+ </Card>{kind==='replay'&&<div className="info-strip"><strong>Replay programmes:</strong>&nbsp; Pick the channel, set the original broadcast start and end, then upload the MP4 recording or paste your provider's catch-up link. TVs list it under Replay once the broadcast has ended.</div>}{feedback.node}</>
 }
 

@@ -46,3 +46,11 @@ test('a featured replay banner (a video library video) is published to Replay on
  const {body:preview}=await admin.get('/api/admin/preview/home?profileId=public&mode=published').expect(200);
  assert.ok(!preview.sections.find(s=>s.type==='featured_banner').data.some(x=>x.placement==='replay'));
 });
+
+test('a replay programme needs a provider catch-up link or an uploaded recording to publish',async()=>{
+ const {body:channels}=await admin.get('/api/admin/resources/channels?published=1');
+ const base={title:'Evening news • Oman TV',status:'published',category:'News',visibleTo:['public'],channelId:channels[0].id,available:true,eventStart:new Date(Date.now()-26*3600e3).toISOString(),eventEnd:new Date(Date.now()-25*3600e3).toISOString()};
+ await send('post','/api/admin/resources/replay',{payload:base}).expect(422);
+ await send('post','/api/admin/resources/replay',{payload:{...base,videoRef:'DEMO_VOD_1'}}).expect(201);
+ await send('post','/api/admin/resources/replay',{payload:{...base,status:'draft'}}).expect(201);
+});
