@@ -37,6 +37,32 @@ All device calls use `X-Screen-Key`. Do not use serial number, IP address or a p
 
 Socket.IO uses WebSocket transport and `auth.deviceKey`. `sync-required` is only a notification hint. The browser fetches `/api/app/sync` after connection/reconnection and every 30 seconds. The Flutter implementation polls config/sync every 10 seconds and does not require a native Socket.IO dependency. Redis Streams keeps each device delivery pending until Applied commits to SQL; the worker then XACKs and removes the entry. Received/Downloaded/Failed messages remain pending. Superseded or revoked deliveries are retired as cancellations. The HTTP ACK endpoint and payload are unchanged. ETag/If-None-Match yields 304 only once that same device has acknowledged Applied.
 
+## Instant updates (push)
+
+TVs keep a WebSocket open to `/socket.io/` (Socket.IO v4, WebSocket transport only) and join with their device key as `auth.deviceKey`. The server sends:
+
+- `sync-required` when the TV connects and when a release is queued for it (any publish that affects its profile). The TV syncs at once.
+- `live-update` with `{kind: "notifications"}` after a TV notification is sent or cancelled, and `{kind: "ticker"}` after a news/ticker change. The TV refetches that feed at once.
+
+Polling stays as a fallback: a full check every 10 s without push (every 60 s while push is connected), notifications every 4 s without push (30 s with push), Info Hub figures every 15 s on their own timer.
+
+Release assets are cached on the TV by SHA-256 in one shared store, so a new release only downloads files whose checksum is new.
+
+The bundled `infra/Caddyfile` forwards WebSockets as is. Behind Nginx, add:
+
+```nginx
+location /socket.io/ {
+  proxy_pass http://127.0.0.1:8000;
+  proxy_http_version 1.1;
+  proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Connection "upgrade";
+  proxy_set_header Host $host;
+  proxy_read_timeout 120s;
+}
+```
+
+Without it the TV still works, through polling.
+
 ## Bundle format
 
 ```json

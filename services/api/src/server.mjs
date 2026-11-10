@@ -15,12 +15,14 @@ if(production&&!process.env.REDIS_URL)throw Error('REDIS_URL is required for pro
 if(demo&&process.env.DATABASE_URL)logger.warn('MADAR_DEMO=1 adds sample channels, videos, notices and four demo screens with public keys to this database. Set MADAR_DEMO=0 for real use and run scripts/remove-demo-data.mjs to clean it.');
 const db=await openDatabase();await seed(db,{demo});let redis=null,sub=null;
 if(process.env.REDIS_URL){const {createClient}=await import('redis');redis=createClient({url:process.env.REDIS_URL,disableOfflineQueue:true});redis.on('error',e=>logger.warn({message:e.message},'Redis unavailable'));await redis.connect()}
-const server=http.createServer(createApp({db,demo,redis,logger}));
+const app=createApp({db,demo,redis,logger});const server=http.createServer(app);
 const io=new Server(server,{maxHttpBufferSize:8192,transports:['websocket'],cors:{origin:process.env.APP_ORIGIN||false}});
 io.use(async(socket,next)=>{try{const s=await authenticateDevice(db,socket.handshake.auth?.deviceKey);socket.data.screenId=s.id;next()}catch{next(Error('Invalid device credential'))}});
 io.on('connection',socket=>{socket.join(socket.data.screenId);socket.emit('sync-required',{reason:'connected'})});
 if(redis){const {createAdapter}=await import('@socket.io/redis-adapter');sub=redis.duplicate();sub.on('error',e=>logger.warn({message:e.message},'Redis subscriber unavailable'));await sub.connect();io.adapter(createAdapter(redis,sub))}
 const emit=(id,payload)=>{io.to(id).emit('sync-required',payload)};
+// Notifications and ticker changes reach every connected TV at once.
+app.locals.events.on('live',kind=>io.emit('live-update',{kind}));
 const delivery=redis?new DeliveryStream({db,redis,emit,logger}):null;
 let working=false;
 async function deliveryTick(){if(working)return;working=true;try{if(delivery)await delivery.tick();else await dispatchDue(db,emit)}catch(e){logger.error({err:e},'Delivery retry cycle failed')}finally{working=false}}

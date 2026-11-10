@@ -1,3 +1,4 @@
+import {EventEmitter} from 'node:events';
 import {managedOperations} from './managed-operations.mjs';
 import {scanBuffer} from './scan.mjs';
 import express from 'express';
@@ -44,6 +45,11 @@ export function createApp({db,demo=false,odooFetch,connectorFetch,redis=null,log
  // Media playback tokens are masked; set LOG_REQUESTS=0 to turn this off.
  if(logger&&process.env.LOG_REQUESTS!=='0')app.use((req,res,next)=>{if(!req.path.startsWith('/api/')&&!req.path.startsWith('/socket.io'))return next();const started=Date.now();res.on('finish',()=>logger[res.statusCode>=500?'error':res.statusCode>=400?'warn':'info']({method:req.method,url:req.originalUrl.split('?')[0].replace(/^\/api\/media\/[^/]+/,'/api/media/***'),status:res.statusCode,ms:Date.now()-started},'request'));next()});
  app.use(express.json({limit:'1mb'}),cookieParser());
+ // Live updates: after a successful admin change to TV notifications or the
+ // news ticker, tell connected TVs to fetch it now (server.mjs relays the
+ // event over Socket.IO; TVs still poll as a fallback).
+ const events=new EventEmitter();app.locals.events=events;
+ app.use((req,res,next)=>{if(req.method!=='GET'){const kind=req.path.startsWith('/api/admin/notifications')?'notifications':req.path.startsWith('/api/admin/news')?'ticker':null;if(kind)res.on('finish',()=>{if(res.statusCode<300)events.emit('live',kind)})}next()});
  const limiter=(prefix,max,windowMs=60000,options={})=>rateLimit({windowMs,limit:max,standardHeaders:'draft-8',legacyHeaders:false,passOnStoreError:true,...options,...(redis?{store:new RedisStore({prefix,sendCommand:(...args)=>redis.sendCommand(args)})}:{})});
  const failedDeviceAuth=limiter('madar:device-auth:',60);
  const deviceRequests=limiter('madar:device:',Number(process.env.DEVICE_RATE_LIMIT||180),60000,{keyGenerator:req=>req.screen.id});
