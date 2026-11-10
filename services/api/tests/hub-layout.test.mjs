@@ -70,6 +70,8 @@ test('Info Hub drafts are validated, versioned and published to TVs',async()=>{
  assert.deepEqual(bundle.profile.experience.hubGroups.find(g=>g.id==='live').pages,['info-meetings']);
  assert.deepEqual(bundle.pages['info-work'].sections.map(x=>x.type),['work_helpdesk']);
  assert.equal(bundle.pages['info-work'].sections[0].layout.w,12);
+ const {body:work}=await request(app).get('/api/app/pages/info-work').set('X-Screen-Key',device).expect(200);
+ assert.deepEqual(work.sections.map(x=>x.source),['helpdesk']);
 
  const {body:versions}=await admin.get('/api/admin/layouts/info_hub/versions?profileId=management');
  assert.deepEqual(versions.map(v=>v.version),[2,1]);

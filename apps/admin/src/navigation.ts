@@ -89,7 +89,7 @@ export const sections = [
       { id: "assets", label: "Media Assets", icon: FolderOpen },
       { id: "content:channels", label: "Live TV Channels", icon: Tv },
       { id: "content:videos", label: "Video Library", icon: Clapperboard },
-      { id: "content:replay", label: "Catch-Up Sources", icon: History },
+      { id: "content:replay", label: "Replay Sources", icon: History },
       { id: "content:radio", label: "Radio Stations", icon: Radio },
       {
         id: "content:featured",

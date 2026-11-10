@@ -151,7 +151,7 @@ Recommended optional artwork is 1920 × 1080 landscape and 1080 × 1920 portrait
 | Page | Banner and discovery | Main action |
 |---|---|---|
 | Videos | Focus updates hero; Continue Watching, recommendations, recent items, favourites and categories | Select plays/resumes; Details exposes full metadata and Start over |
-| Replay | Programme title, original broadcast time, channel and actual availability/expiry; channel/date filtering | Play/resume only an available authorized Catch-Up record |
+| Replay | Video Library videos: featured videos from Banners → Replay (sliding every 8 s), Continue watching (videos this screen started and left, from Profiles → Viewing history), category filter, then every video | Play/resume on TV and browser TV; finished videos move to Watched recently |
 | Live TV | Focused channel logo/name, current/next programme and current-programme progress | Watch Live; missing guide falls back to channel branding |
 
 The featured area does not start video merely because focus moved. Media cards have a direct action and a normal focusable path to details/favourites; a long-press shortcut must never be the only way to save content. Returning from details/playback retains the originating list context where the item still exists. If publication removed the item, focus falls back to a valid target.
