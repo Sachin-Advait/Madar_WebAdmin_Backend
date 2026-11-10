@@ -14,6 +14,7 @@ const PageBuilder=React.lazy(()=>import('./pages/PageBuilder'));
 const DashboardBuilder=React.lazy(()=>import('./pages/DashboardBuilder'));
 const Preview=React.lazy(()=>import('./pages/TVPreview'));
 const ContentManager=React.lazy(()=>import('./pages/ContentManager'));
+const Banners=React.lazy(()=>import('./pages/Banners'));
 const Notifications=React.lazy(()=>import('./pages/Notifications'));
 const BreakingNews=React.lazy(()=>import('./pages/BreakingNews'));
 import Profiles from './pages/Profiles';
@@ -84,6 +85,7 @@ function Studio({user,onLogout}:{user:User;onLogout:()=>void}){
   if(view==='profiles')return <Profiles catalog={catalog!} role={user.role}/>;
   if(view==='screens')return <Screens catalog={catalog!} role={user.role}/>;
   if(view==='schedules')return <Schedules catalog={catalog!} role={user.role}/>;
+  if(view==='content:featured')return <Banners catalog={catalog!} role={user.role}/>;
   if(view.startsWith('content:'))return <ContentManager key={view} kind={view.slice(8)} catalog={catalog!} role={user.role}/>;
   if(view==='users'||view==='audit')return <Access mode={view} role={user.role}/>;
   if(view==='settings')return <SettingsPage role={user.role}/>;

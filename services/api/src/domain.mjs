@@ -36,6 +36,9 @@ Object.assign(catalog.resourceSchemas.services.properties,{contact:{type:'string
 Object.assign(catalog.resourceSchemas.visitor.properties,{accessibility:{type:'string',title:'Accessibility / step-free access'},contact:{type:'string',title:'Contact desk'}});
 Object.assign(catalog.resourceSchemas.events.properties,{registrationUrl:{type:'string',title:'Registration URL'},audience:{type:'string',title:'Audience'}});
 Object.assign(catalog.resourceSchemas.notices.properties,{referenceNumber:{type:'string',title:'Notice reference'},department:{type:'string',title:'Issuing department'}});
+// Featured banners show on Home, or on Replay as a "featured programme" that points at a catch-up programme.
+catalog.resourceSchemas.featured.properties.targetType.enum.push('replay');
+Object.assign(catalog.resourceSchemas.featured.properties,{placement:{type:'string',title:'Where the banner shows',enum:['home','replay'],default:'home'},bannerLabel:{type:'string',title:'Banner label',maxLength:40},screenGroups:{type:'array',title:'Screen groups (empty = every screen)',items:{type:'string',maxLength:100},uniqueItems:true,maxItems:50}});
 Object.assign(catalog.resourceSchemas.alerts.properties,{instructions:{type:'string',title:'What viewers should do'}});
 const common=structuredClone(catalog.resourceSchemas.notices);
 for(const [kind,label,properties,required] of [

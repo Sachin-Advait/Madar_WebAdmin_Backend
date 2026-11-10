@@ -93,7 +93,7 @@ export const sections = [
       { id: "content:radio", label: "Radio Stations", icon: Radio },
       {
         id: "content:featured",
-        label: "Featured Banners",
+        label: "Banners",
         icon: GalleryHorizontal,
       },
       { id: "content:notices", label: "Official Notices", icon: Megaphone },

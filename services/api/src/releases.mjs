@@ -32,7 +32,7 @@ export async function releaseProfile(db,profileId,reason){
  if(hubLayout&&allowedPage(profile,'info-hub')){const hub=applyHubLayout(profile.experience,hubLayout,page=>allowedPage(profile,page)&&odooPageAllowed(odoo,profile.profileType,page));profile.experience=hub.experience;if(hub.workPage)pages['info-work']=hub.workPage}
  const content={};const assetIds=new Set(),artworkIds=new Set();const definitions=(await dynamicCatalog(db)).fieldDefinitions;
  for(const row of await rows(db,'SELECT kind,id,published,created_at,updated_at FROM resources WHERE published IS NOT NULL ORDER BY kind,id')){
-   const p=row.published;if(p.status!=='published'||!p.visibleTo?.includes(profile.profileType)||!allowedPage(profile,contentPage[row.kind]))continue;
+   const p=row.published;if(p.status!=='published'||!p.visibleTo?.includes(profile.profileType)||!allowedPage(profile,row.kind==='featured'&&p.placement==='replay'?'replay':contentPage[row.kind]))continue;
    for(const field of ['image','landscapeImage','portraitImage'])check(!p[field]||!/^https:/i.test(p[field]),422,'Upload artwork before publication so TVs can verify and cache it');
    for(const field of ['image','landscapeImage','portraitImage'])if(p[field]?.startsWith('/api/assets/'))artworkIds.add(p[field].split('/').pop());
    const safe={...p,id:row.id,createdAt:row.created_at,updatedAt:row.updated_at};if(['videos','replay'].includes(row.kind))safe.mediaRevision=playbackRevision(p);for(const k of ['streamRef','stationRef','providerRef','videoRef'])delete safe[k];
