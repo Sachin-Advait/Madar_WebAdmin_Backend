@@ -18,14 +18,19 @@ before(async()=>{
 });
 after(async()=>{await db?.close();await rm(assets,{recursive:true,force:true})});
 
-test('a featured replay banner is published to Replay only, for its profiles and period',async()=>{
+test('a featured replay banner (a video library video) is published to Replay only, for its profiles and period',async()=>{
+ const {body:videos}=await admin.get('/api/admin/resources/videos?published=1');
+ const programme=videos.find(r=>r.status==='published'&&r.visibleTo?.includes('public'));
  const {body:replays}=await admin.get('/api/admin/resources/replay?published=1');
- const programme=replays.find(r=>r.status==='published');
+ const catchup=replays.find(r=>r.status==='published');
  const base={title:'Discover Oman — Mountain Villages',description:'Explore the traditions and landscapes of Jebel Akhdar.',status:'published',placement:'replay',bannerLabel:'Featured Replay',ctaText:'Watch replay',sortOrder:0,visibleTo:['public'],screenGroups:['Main building'],startAt:new Date(Date.now()-3600e3).toISOString(),endAt:new Date(Date.now()+7*86400e3).toISOString()};
  await send('post','/api/admin/resources/featured',{payload:{...base,targetType:'video'}}).expect(422);
- await send('post','/api/admin/resources/featured',{payload:{...base,targetType:'replay',targetId:'missing'}}).expect(422);
- const {body:created}=await send('post','/api/admin/resources/featured',{payload:{...base,targetType:'replay',targetId:programme.id}});assert.ok(created.id);
- await send('post','/api/admin/resources/featured',{payload:{...base,title:'Employees only',targetType:'replay',targetId:programme.id,visibleTo:['employee']}});
+ await send('post','/api/admin/resources/featured',{payload:{...base,targetType:'channel',targetId:'x'}}).expect(422);
+ await send('post','/api/admin/resources/featured',{payload:{...base,targetType:'video',targetId:'missing'}}).expect(422);
+ const {body:created}=await send('post','/api/admin/resources/featured',{payload:{...base,targetType:'video',targetId:programme.id}});assert.ok(created.id);
+ // Older banners that point at a catch-up programme still validate.
+ await send('post','/api/admin/resources/featured',{payload:{...base,status:'draft',targetType:'replay',targetId:catchup.id}}).expect(201);
+ await send('post','/api/admin/resources/featured',{payload:{...base,title:'Employees only',targetType:'video',targetId:programme.id,visibleTo:['employee']}});
 
  const {body:d}=await request(app).get('/api/app/sync').set('X-Screen-Key',device).expect(200);
  const bundle=JSON.parse(d.bundleText);
