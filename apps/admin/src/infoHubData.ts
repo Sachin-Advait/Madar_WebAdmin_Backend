@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { API } from "./api";
+import { API } from "./api";
 import type { Catalog, LayoutSection, PageLayout } from "./types";
 
 type LayoutResponse = Awaited<ReturnType<typeof API.layout>>;
@@ -345,112 +345,81 @@ export const HUB_DATA: Record<string, any> = {
 
 /* ───────────── layout store ───────────── */
 
-type Version = {
-  version: number;
-  publishedAt: string;
-  sections: LayoutSection[];
-};
-type Saved = {
-  draft: LayoutSection[];
-  revision: number;
-  publishedVersion: number;
-  versions: Version[];
-};
+// The Info Hub layout is stored by the MADAR API like every other page
+// ("info_hub" in /api/admin/layouts). Publishing it sets the sections, order
+// and panel titles of the Info Hub tabs on TVs of that profile.
 
-const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v));
-const wait = <T>(v: T) => new Promise<T>((r) => setTimeout(() => r(v), 180));
-const mem: Record<string, Saved> = {};
-const key = (p: string) => `infohub:layout:${p}`;
+type Version = { version: number; sections: LayoutSection[] };
+type LocalDraft = { draft: LayoutSection[]; versions?: Version[] };
 
-function seed(): Saved {
-  const sections: LayoutSection[] = Object.entries(DEFS).map(
-    ([type, d], i) => ({
+// Earlier admin builds kept Info Hub drafts in this browser only. A draft
+// found here is moved to the server once, then removed from the browser.
+const localKey = (p: string) => `infohub:layout:${p}`;
+function takeLocalDraft(profile: string): LayoutSection[] | null {
+  try {
+    const raw = localStorage.getItem(localKey(profile));
+    if (!raw) return null;
+    const saved = JSON.parse(raw) as LocalDraft;
+    return Array.isArray(saved?.draft) ? saved.draft : null;
+  } catch {
+    return null;
+  }
+}
+function dropLocalDraft(profile: string) {
+  try {
+    localStorage.removeItem(localKey(profile));
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+/** The Info Hub layout a profile starts with (matches the API default). */
+export function defaultHubLayout(): PageLayout {
+  return {
+    schemaVersion: 1,
+    pageKey: HUB_PAGE,
+    sections: Object.entries(DEFS).map(([type, d], i) => ({
       id: `${type}-main`,
       type,
       enabled: true,
       order: i,
       props: { ...d.defaults },
       layout: { x: 0, y: i * 4, w: d.wide ? 12 : 6, h: 4 },
-    }),
-  );
-  return {
-    draft: sections,
-    revision: 1,
-    publishedVersion: 1,
-    versions: [
-      {
-        version: 1,
-        publishedAt: new Date().toISOString(),
-        sections: clone(sections),
-      },
-    ],
+    })),
   };
-}
-function read(profile: string): Saved {
-  if (mem[profile]) return mem[profile];
-  try {
-    const raw = localStorage.getItem(key(profile));
-    if (raw) return (mem[profile] = JSON.parse(raw));
-  } catch {
-    /* storage unavailable */
-  }
-  return (mem[profile] = seed());
-}
-function commit(profile: string, s: Saved) {
-  mem[profile] = s;
-  try {
-    localStorage.setItem(key(profile), JSON.stringify(s));
-  } catch {
-    /* storage unavailable */
-  }
 }
 
 export const hubApi = {
-  layout: (profile: string) => {
-    const s = read(profile);
-    return wait({
-      draft: {
-        schemaVersion: 1,
-        pageKey: HUB_PAGE,
-        sections: clone(s.draft),
-      },
-      revision: s.revision,
-      publishedVersion: s.publishedVersion,
-    } as unknown as LayoutResponse);
-  },
-  versions: (profile: string) =>
-    wait(
-      read(profile).versions.map(({ version, publishedAt }) => ({
-        version,
-        publishedAt,
-      })) as unknown as VersionsResponse,
-    ),
-  saveLayout: (profile: string, layout: PageLayout, _revision?: number) => {
-    const s = clone(read(profile));
-    s.draft = clone(layout.sections);
-    s.revision += 1;
-    commit(profile, s);
-    return wait({ revision: s.revision });
-  },
-  publish: (profile: string, _revision?: number) => {
-    const s = clone(read(profile));
-    s.publishedVersion += 1;
-    s.versions.unshift({
-      version: s.publishedVersion,
-      publishedAt: new Date().toISOString(),
-      sections: clone(s.draft),
-    });
-    commit(profile, s);
-    return wait({ publishedVersion: s.publishedVersion });
-  },
-  rollback: (profile: string, version: number, _revision?: number) => {
-    const s = clone(read(profile));
-    const v = s.versions.find((x) => x.version === version);
-    if (v) {
-      s.draft = clone(v.sections);
-      s.revision += 1;
-      commit(profile, s);
+  layout: async (profile: string): Promise<LayoutResponse> => {
+    const current = await API.layout(HUB_PAGE, profile);
+    const local = takeLocalDraft(profile);
+    if (!local) return current;
+    const same =
+      JSON.stringify(local) === JSON.stringify(current.draft.sections);
+    if (!same && current.publishedVersion <= 1 && current.revision <= 1) {
+      try {
+        await API.saveLayout(
+          HUB_PAGE,
+          profile,
+          { schemaVersion: 1, pageKey: HUB_PAGE, sections: local } as PageLayout,
+          current.revision,
+        );
+      } catch {
+        // Keep the browser copy if the server refused it.
+        return current;
+      }
+      dropLocalDraft(profile);
+      return API.layout(HUB_PAGE, profile);
     }
-    return wait({ revision: s.revision });
+    dropLocalDraft(profile);
+    return current;
   },
+  versions: (profile: string): Promise<VersionsResponse> =>
+    API.versions(HUB_PAGE, profile),
+  saveLayout: (profile: string, layout: PageLayout, revision: number) =>
+    API.saveLayout(HUB_PAGE, profile, layout, revision),
+  publish: (profile: string, revision: number) =>
+    API.publish(HUB_PAGE, profile, revision),
+  rollback: (profile: string, version: number, revision: number) =>
+    API.rollback(HUB_PAGE, profile, version, revision),
 };

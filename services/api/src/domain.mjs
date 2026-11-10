@@ -4,6 +4,7 @@ import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import raw from '../../../shared/catalog.json' with {type:'json'};
 import {validateExperience} from './experience-config.mjs';
+import {HUB_LAYOUT_PAGE,validateHubLayout} from './hub-layout.mjs';
 export const catalog=structuredClone(raw);
 for(const layout of Object.values(catalog.defaults)){let y=0,half=false;for(const section of layout.sections){if(catalog.widgets[section.type].grid){section.layout={x:half?6:0,y,w:6,h:4};if(half)y+=4;half=!half}else{if(half)y+=4;half=false;section.layout={x:0,y,w:12,h:4};y+=4}}}
 // Daily Tasks: the KPI cards sit above a full-width, taller table of unfinished tasks.
@@ -68,7 +69,7 @@ export function validateResource(kind,input,schema){check(validators[kind],404,'
  }
  return p;
 }
-export function validateLayout(page,l){check(catalog.pages[page],404,'Unknown page');check(l&&l.schemaVersion===1&&l.pageKey===page&&Array.isArray(l.sections)&&l.sections.length<=40,422,'Invalid page layout');const ids=new Set();
+export function validateLayout(page,l){if(page===HUB_LAYOUT_PAGE)return validateHubLayout(l);check(catalog.pages[page],404,'Unknown page');check(l&&l.schemaVersion===1&&l.pageKey===page&&Array.isArray(l.sections)&&l.sections.length<=40,422,'Invalid page layout');const ids=new Set();
  for(const s of l.sections){check(typeof s.id==='string'&&!ids.has(s.id),422,'Duplicate or missing widget ID');ids.add(s.id);check(catalog.pageWidgets[page].includes(s.type),422,'Widget not allowed on this page');check(typeof s.enabled==='boolean'&&Number.isInteger(s.order),422,'Invalid widget state');check(widgetValidators[s.type](s.props),422,ajv.errorsText(widgetValidators[s.type].errors));const p=s.layout;check(p&&['x','y','w','h'].every(k=>Number.isInteger(p[k]))&&p.x>=0&&p.y>=0&&p.w>=1&&p.h>=1&&p.x+p.w<=12&&p.h<=24&&p.y<=1000,422,'Widget is outside the 12-column grid')}
  return l;
 }

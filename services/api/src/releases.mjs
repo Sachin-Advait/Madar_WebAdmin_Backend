@@ -4,6 +4,19 @@ import {dynamicCatalog,contentPage} from './cms.mjs';
 import {playbackRevision} from './preferences.mjs';
 import {resolvedExperience} from './experience-config.mjs';
 import {odooSettings,odooPageAllowed} from './odoo.mjs';
+import {HUB_LAYOUT_PAGE,applyHubLayout} from './hub-layout.mjs';
+/**
+ * TV experience settings with the published Info Hub layout from the Page
+ * Builder applied (tab contents, order and panel titles). Without a published
+ * Info Hub layout the settings are returned unchanged.
+ */
+export async function hubExperience(db,profile,experience,odoo){
+ if(!allowedPage(profile,'info-hub'))return experience;
+ const l=await one(db,'SELECT published FROM layouts WHERE page_key=$1 AND profile_id=$2',[HUB_LAYOUT_PAGE,profile.id]);
+ if(!l?.published)return experience;
+ odoo??=await odooSettings(db);
+ return applyHubLayout(experience,l.published,page=>allowedPage(profile,page)&&odooPageAllowed(odoo,profile.profileType,page)).experience;
+}
 export const audit=(db,actor,action,entity,id,detail={})=>db.query('INSERT INTO audit(actor,action,entity,entity_id,detail) VALUES($1,$2,$3,$4,$5)',[actor,action,entity,id,JSON.stringify(detail)]);
 export async function queueDevice(db,screenId,releaseId){
  await db.query('SELECT id FROM screens WHERE id=$1 FOR UPDATE',[screenId]);
@@ -14,7 +27,9 @@ export async function queueDevice(db,screenId,releaseId){
 export async function releaseProfile(db,profileId,reason){
  const pr=await one(db,'SELECT * FROM profiles WHERE id=$1 FOR UPDATE',[profileId]);check(pr,404,'Profile not found');const profile={...pr.payload,experience:resolvedExperience(pr.payload)};
  const odoo=await odooSettings(db);
- const pages={};for(const l of await rows(db,'SELECT * FROM layouts WHERE profile_id=$1 AND published IS NOT NULL ORDER BY page_key',[profileId]))if(allowedPage(profile,l.page_key)&&odooPageAllowed(odoo,profile.profileType,l.page_key))pages[l.page_key]=l.published;
+ const pages={};let hubLayout=null;for(const l of await rows(db,'SELECT * FROM layouts WHERE profile_id=$1 AND published IS NOT NULL ORDER BY page_key',[profileId])){if(l.page_key===HUB_LAYOUT_PAGE){hubLayout=l.published;continue}if(allowedPage(profile,l.page_key)&&odooPageAllowed(odoo,profile.profileType,l.page_key))pages[l.page_key]=l.published}
+ // The Page Builder's Info Hub layout sets the tabs' sections and titles, and which parts Work & Support shows.
+ if(hubLayout&&allowedPage(profile,'info-hub')){const hub=applyHubLayout(profile.experience,hubLayout,page=>allowedPage(profile,page)&&odooPageAllowed(odoo,profile.profileType,page));profile.experience=hub.experience;if(hub.workPage)pages['info-work']=hub.workPage}
  const content={};const assetIds=new Set(),artworkIds=new Set();const definitions=(await dynamicCatalog(db)).fieldDefinitions;
  for(const row of await rows(db,'SELECT kind,id,published,created_at,updated_at FROM resources WHERE published IS NOT NULL ORDER BY kind,id')){
    const p=row.published;if(p.status!=='published'||!p.visibleTo?.includes(profile.profileType)||!allowedPage(profile,contentPage[row.kind]))continue;
