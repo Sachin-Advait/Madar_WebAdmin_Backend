@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Eye, EyeOff, Globe2, KeyRound, LockKeyhole, Mail, Pause, Play } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Eye, EyeOff, KeyRound, LockKeyhole, Mail, Pause, Play } from 'lucide-react';
 import entrance from '../assets/admin-login/entrance.webp';
 import courtyard from '../assets/admin-login/courtyard.webp';
 import corridor from '../assets/admin-login/corridor.webp';
@@ -10,7 +10,7 @@ import './glass-login.css';
 const images = [entrance, courtyard, corridor];
 const copy = {
   en: {
-    brand: 'Info Hub', studio: 'Admin Studio', access: 'Administrator access', title: 'Welcome back.',
+    brand: 'Madar', studio: 'Admin Studio', access: 'Administrator access', title: 'Welcome back.',
     description: 'Sign in to manage your content and TV screens.',
     email: 'Email address', password: 'Password', emailHint: 'name@organisation.om', passHint: 'Enter your password',
     show: 'Show password', hide: 'Hide password', submit: 'Sign in', busy: 'Signing in…',
@@ -20,7 +20,7 @@ const copy = {
     error: 'Sign-in failed. Please try again.',
   },
   ar: {
-    brand: 'مركز المعلومات', studio: 'لوحة الإدارة', access: 'دخول المسؤولين', title: 'أهلاً بعودتك',
+    brand: 'مدار', studio: 'لوحة الإدارة', access: 'دخول المسؤولين', title: 'أهلاً بعودتك',
     description: 'سجّل الدخول لإدارة المحتوى وشاشات العرض.',
     email: 'البريد الإلكتروني', password: 'كلمة المرور', emailHint: 'name@organisation.om', passHint: 'أدخل كلمة المرور',
     show: 'إظهار كلمة المرور', hide: 'إخفاء كلمة المرور', submit: 'تسجيل الدخول', busy: 'جارٍ تسجيل الدخول…',
@@ -38,8 +38,10 @@ type Props = {
 };
 
 export default function AdminLogin({ onSubmit, initialEmail = '', onExploreDemo }: Props) {
-  const [lang, setLang] = useState<Language>('en');
+  const lang = 'en' as Language;
   const [slide, setSlide] = useState(0);
+  const [previous, setPrevious] = useState<number | null>(null);
+  const [direction, setDirection] = useState(1);
   const [motion, setMotion] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [visible, setVisible] = useState(false);
   const [email, setEmail] = useState(initialEmail);
@@ -57,11 +59,18 @@ export default function AdminLogin({ onSubmit, initialEmail = '', onExploreDemo 
   }, []);
   useEffect(() => {
     if (!motion) return;
-    const timer = window.setTimeout(() => setSlide(index => (index + 1) % images.length), 12000);
+    const timer = window.setTimeout(() => selectSlide(1), 7000);
     return () => window.clearTimeout(timer);
   }, [slide, motion]);
   function selectSlide(offset: number) {
-    setSlide(index => (index + offset + images.length) % images.length);
+    setDirection(offset < 0 ? -1 : 1);
+    setPrevious(slide);
+    setSlide((slide + offset + images.length) % images.length);
+  }
+  function pictureClass(index: number) {
+    if (index === slide) return ' ih-login__picture--active';
+    if (index === previous) return direction > 0 ? ' ih-login__picture--out-left' : ' ih-login__picture--out-right';
+    return direction > 0 ? ' ih-login__picture--wait-right' : ' ih-login__picture--wait-left';
   }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -85,10 +94,6 @@ export default function AdminLogin({ onSubmit, initialEmail = '', onExploreDemo 
           <span className="ih-login__symbol"><img src={logo} alt="MADAR" /></span>
           <span className="ih-login__wordmark"><strong>{t.brand}</strong><small>{t.studio}</small></span>
         </div>
-        <button type="button" className="ih-login__language" aria-label={t.language}
-          onClick={() => setLang(arabic ? 'en' : 'ar')}>
-          <Globe2 size={17} aria-hidden="true" /><span lang={arabic ? 'en' : 'ar'}>{arabic ? 'English' : 'العربية'}</span>
-        </button>
       </header>
       <div className="ih-login__layout">
         <section className="ih-login__auth" aria-labelledby="ih-login-title">
@@ -123,7 +128,7 @@ export default function AdminLogin({ onSubmit, initialEmail = '', onExploreDemo 
           </div>
         </section>
         <figure className="ih-login__gallery" aria-label={t.gallery} data-motion={motion ? 'on' : 'off'}>
-          {images.map((src, index) => <div className={'ih-login__picture'+(index === slide ? ' ih-login__picture--active' : '')}
+          {images.map((src, index) => <div className={'ih-login__picture'+pictureClass(index)}
             key={src} aria-hidden="true"><img src={src} alt="" fetchPriority={index === 0 ? 'high' : 'auto'}/></div>)}
           <button type="button" className="ih-login__motion" aria-label={motion ? t.pause : t.play}
             title={motion ? t.pause : t.play} onClick={() => setMotion(value => !value)}>
