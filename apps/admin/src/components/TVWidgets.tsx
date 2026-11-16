@@ -24,5 +24,5 @@ export function WidgetCard({section,compact=false}:{section:PreviewSection;compa
 }
 
 export function TVFrame({children,label='MADAR',page='Home',demo=false}:{children:React.ReactNode;label?:string;page?:string;demo?:boolean}){
- return <div className="tv-frame"><div className="tv-topnav"><div className="tv-logo"><span className="tv-logo-mark">◈</span> {label}</div><div className="tv-menu">{['Home','Live TV','Videos','Replay','Radio','Info Hub'].map(n=><span key={n} className={page.toLowerCase()===n.toLowerCase()?'tv-menu-active':''}>{n}</span>)}</div><div className="tv-clock">09:41</div></div><div className="tv-frame-body">{demo&&<div className="preview-demo-label">ILLUSTRATIVE SAMPLE DATA</div>}{children}</div></div>
+ return <div className="tv-frame"><div className="tv-topnav"><div className="tv-logo"><span className="tv-logo-mark">◈</span> {label}</div><div className="tv-menu">{['Home','Live TV','VOD','Replay','Radio','Info Hub'].map(n=><span key={n} className={page.toLowerCase()===n.toLowerCase()?'tv-menu-active':''}>{n}</span>)}</div><div className="tv-clock">09:41</div></div><div className="tv-frame-body">{demo&&<div className="preview-demo-label">ILLUSTRATIVE SAMPLE DATA</div>}{children}</div></div>
 }
