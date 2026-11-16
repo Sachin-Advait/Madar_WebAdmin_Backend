@@ -1,0 +1,27 @@
+/* Live TV Channels / Radio Stations: All ↔ Current panels */
+.pb-board{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:18px;border-top:1px solid #ece9e1}
+.pb-panel{display:flex;flex-direction:column;min-width:0;min-height:320px;background:#fbfaf6;border:1.5px dashed #e3ddcf;border-radius:12px;transition:border-color .15s,background .15s}
+.pb-panel.pb-current{background:#fffdf8;border-style:solid;border-color:#e6dccb}
+.pb-panel.is-over{border-color:#986b42;border-style:dashed;background:#f6eee2}
+.pb-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:16px 16px 12px;border-bottom:1px solid #eeeae0}
+.pb-head h3{margin:0;font-size:15px;font-weight:600;color:#3d3a31}
+.pb-current .pb-head h3{color:#7d512f}
+.pb-head p{margin:4px 0 0;font-size:11px;color:#939487}
+.pb-list{display:flex;flex-direction:column;gap:8px;padding:12px;flex:1;overflow:auto;max-height:640px}
+.pb-card{display:flex;align-items:center;gap:10px;padding:10px 10px 10px 6px;background:#fff;border:1px solid #ebe7dd;border-radius:10px;cursor:grab;box-shadow:0 1px 3px #3e34200a;transition:box-shadow .15s,opacity .15s}
+.pb-card:hover{box-shadow:0 4px 14px #5a462a17;border-color:#dccfb8}
+.pb-card:active{cursor:grabbing}
+.pb-card[draggable=false]{cursor:default}
+.pb-card.is-dragging{opacity:.45}
+.pb-card.is-moving{opacity:.6;pointer-events:none}
+.pb-grip{color:#c2b8a6;flex-shrink:0}
+.pb-card .table-thumb{flex-shrink:0}
+.pb-copy{flex:1;min-width:0}
+.pb-copy strong{display:block;font-size:12.5px;font-weight:600;color:#3f3d34;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pb-copy small{display:block;font-size:10.5px;color:#999b8d;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pb-actions{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.pb-move{color:#7d512f}
+.pb-empty{flex:1;display:grid;place-items:center}
+.pb-note{margin:0 18px 12px;font-size:11px;color:#8d8e7e}
+@media (max-width:1100px){.pb-board{grid-template-columns:1fr}}
+@media (max-width:600px){.pb-board{padding:10px}.pb-card{flex-wrap:wrap}.pb-actions{width:100%;justify-content:flex-end}}
