@@ -111,8 +111,6 @@ export const sections = [
       "locations",
       "departments",
       "groups",
-      "rooms",
-      "counters",
       "categories",
       "languages",
       "providers",
