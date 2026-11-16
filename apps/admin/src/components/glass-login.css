@@ -1,0 +1,35 @@
+.ih-login .ih-login__layout {position:relative;isolation:isolate;grid-template-columns:minmax(0,1fr) minmax(430px,.88fr);min-height:650px;}
+.ih-login .ih-login__gallery {grid-column:1 / -1;grid-row:1;z-index:0;min-height:100%;border-radius:26px;}
+.ih-login .ih-login__auth {position:relative;grid-column:2;grid-row:1;z-index:1;padding:clamp(24px,4vw,68px);pointer-events:none;}
+.ih-login .ih-login__formwrap {
+  pointer-events:auto; position:relative; isolation:isolate; border-radius:25px; padding:clamp(25px,3vw,48px);
+  width:min(100%,480px); max-width:480px;
+  border:1px solid rgba(255,255,255,.85);
+  background:linear-gradient(142deg,rgba(255,253,248,.92),rgba(248,238,222,.81) 62%,rgba(255,253,247,.9));
+  box-shadow:inset 0 1px 1px #fff,inset 0 -1px 2px #b9a78c66,0 22px 60px #291a1752,0 2px 8px #39291b25;
+}
+@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) {
+  .ih-login .ih-login__formwrap {background:linear-gradient(138deg,#ffffffd9,#f8edddab 65%,#fffbf0bf);backdrop-filter:blur(17px) saturate(.82);-webkit-backdrop-filter:blur(17px) saturate(.82);}
+}
+.ih-login .ih-login__formwrap h1 {font-size:clamp(40px,3.8vw,65px);}
+.ih-login .ih-login__field {background:#fffdf8b8;border-color:#a78c6b70;box-shadow:0 1px 0 #fff9,inset 0 1px 2px #6143240c;}
+.ih-login .ih-login__submit {background:linear-gradient(105deg,#986b42,#674025);box-shadow:0 6px 14px #5e391f2e,inset 0 1px 0 #ffffff7a;}
+.ih-login .ih-login__description {color:#534639;}
+.ih-login .ih-login__explore {display:flex;margin:15px auto 0;align-items:center;justify-content:center;min-height:34px;gap:8px;border:0;background:transparent;font-size:13px;font-weight:600;color:#5b3c25;}
+.ih-login .ih-login__explore:hover {text-decoration:underline;}
+.ih-login .ih-login__caption {width:38%;inset-inline-start:clamp(24px,4vw,62px);inset-inline-end:auto;}
+.ih-login .ih-login__motion {inset-inline-end:auto;inset-inline-start:25px;}
+.ih-login .ih-login__gallery::after {background:linear-gradient(0deg,#25170dd6 0%,#34201130 31%,transparent 64%),linear-gradient(90deg,#38241120,transparent 68%);}
+@media (max-width:1000px) and (min-width:701px){
+  .ih-login .ih-login__layout {grid-template-columns:minmax(0,.75fr) minmax(390px,1fr);}
+  .ih-login .ih-login__auth {padding:22px;}
+  .ih-login .ih-login__caption {width:32%;}
+}
+@media (max-width:700px){
+  .ih-login .ih-login__layout {grid-template-columns:1fr;grid-template-rows:1fr auto;gap:0;min-height:650px;}
+  .ih-login .ih-login__gallery {grid-column:1;grid-row:1 / 3;min-height:650px;border-radius:19px;}
+  .ih-login .ih-login__auth {grid-column:1;grid-row:1;padding:63px 13px 170px;}
+  .ih-login .ih-login__formwrap {padding:26px 20px;border-radius:18px;}
+  .ih-login .ih-login__caption {width:auto;inset-inline:20px;inset-block-end:21px;}
+  .ih-login .ih-login__motion {inset-inline-start:17px;inset-block-start:14px;}
+}

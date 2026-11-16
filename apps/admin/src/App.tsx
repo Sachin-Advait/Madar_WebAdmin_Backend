@@ -5,7 +5,8 @@ import {navigationItems,parseAdminHash,adminHash} from './navigation';
 import {AdminSectionLinks,AdminSectionJump} from './components/AdminNavigation';
 import {API,getToken,setToken} from './api';
 import type {Catalog,User} from './types';
-import {Button,ErrorBox,Loading,Notice} from './components/Common';
+import {ErrorBox,Loading} from './components/Common';
+import AdminLogin from './components/AdminLogin';
 import Overview from './pages/ControlRoom';
 const Masters=React.lazy(()=>import('./pages/Masters'));
 const ContentFields=React.lazy(()=>import('./pages/ContentFields'));
@@ -27,10 +28,12 @@ import SettingsPage from './pages/Settings';
 
 
 
-function Login({onLogin}:{onLogin:(u:User)=>void}){
- const [email,setEmail]=useState('admin@madar.local');const [password,setPassword]=useState('');const [busy,setBusy]=useState(false);const [error,setError]=useState('');
- async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setError('');try{const result=await API.login(email,password);setToken(result.token);onLogin(result.user)}catch(e){setError(e instanceof Error?e.message:String(e))}finally{setBusy(false)}}
- return <div className="login-shell"><div className="login-art"><div className="login-orbit">◌</div><div className="login-art-inner"><span className="small-gold">TV EXPERIENCE MANAGEMENT</span><h1>One place.<br/>Every screen.<br/><em>Endless possibilities.</em></h1><p>Configure media, operational dashboards and digital information across every MADAR display.</p></div><span className="login-footer">CONFIGURE  ·  PREVIEW  ·  PUBLISH</span></div><form className="login-card" onSubmit={submit}><div className="brand brand-login"><img className="brand-logo" src="/madar-logo.png" alt="MADAR"/><span>MADAR<small>ADMIN STUDIO</small></span></div><span className="eyebrow">WELCOME BACK</span><h2>Sign in to your workspace</h2><p>Manage published experiences, pages, content and screens.</p><label>Email address<input autoComplete="username" type="email" value={email} onChange={e=>setEmail(e.target.value)} required/></label><label>Password<input autoComplete="current-password" type="password" value={password} onChange={e=>setPassword(e.target.value)} required placeholder="Enter your admin password"/></label>{error&&<ErrorBox error={error}/>}<Button type="submit" loading={busy}>Sign in to Admin Studio</Button><div className="login-hint">Use your MADAR administrator credentials. Demo-only login details are in the developer guide.</div></form></div>
+function Login({onLogin}: {onLogin: (user: User) => void}) {
+  return <AdminLogin initialEmail="admin@madar.local" onSubmit={async (email, password) => {
+    const result = await API.login(email, password);
+    setToken(result.token);
+    onLogin(result.user);
+  }} />;
 }
 
 function Studio({user,onLogout}:{user:User;onLogout:()=>void}){
