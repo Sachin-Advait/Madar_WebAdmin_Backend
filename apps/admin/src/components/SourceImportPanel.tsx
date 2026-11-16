@@ -29,7 +29,7 @@ export default function SourceImportPanel({role}:{role:string}){
   try{setResult(await request<ImportResult>('/api/admin/source-import/apply',{method:'POST',body:JSON.stringify({sourceId,format,text,digest:preview.digest})}));setPreview(null);await Promise.all([client.invalidateQueries({queryKey:['resources']}),client.invalidateQueries({queryKey:['overview']})])}catch(e){setError(e)}finally{setBusy(null)}
  }
  return <Card className="source-import">
-  <div className="card-head"><div><h3>Channel scanner & provider imports</h3><p>Bring channel and guide exports into the shared content catalogue.</p></div><UploadCloud size={22} color="#6b5837"/></div>
+  <div className="card-head"><div><h3>Channel scanner & provider imports</h3><p>Bring channel and guide exports into the shared content catalogue.</p></div><UploadCloud size={22} color="#7d512f"/></div>
   <div className="experience-note">Import the scanner's M3U channel list first, then XMLTV programmes using the same source ID. JSON accepts normalized content from a provider adapter. The device brand can be connected once its export or API contract is known.</div>
   {!canEdit&&<p className="experience-note">An administrator is required to import provider sources.</p>}
   <form className="normal-form" onSubmit={inspect}><fieldset disabled={!canEdit||busy!==null} style={{border:0,padding:0,margin:0,minWidth:0}}>

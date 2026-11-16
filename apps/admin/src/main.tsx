@@ -15,6 +15,7 @@ import './control.css';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import './navigation.css';
+import './brand-theme.css';
 const client=new QueryClient({defaultOptions:{queries:{retry:1,refetchOnWindowFocus:false,staleTime:8000}}});
 createRoot(document.getElementById('root')!).render(<React.StrictMode><QueryClientProvider client={client}>{location.pathname==='/tv'&&import.meta.env.VITE_SHOWCASE!=='1'?<TVDevice/>:<App/>}</QueryClientProvider></React.StrictMode>);
 

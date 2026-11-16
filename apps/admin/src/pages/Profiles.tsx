@@ -7,7 +7,7 @@ import type {Catalog,Role,TVProfile} from '../types';
 import {Button,Card,ErrorBox,FormField,Loading,PageHeading,useFeedback} from '../components/Common';
 import {ExperienceSettings,RecommendationSummary,experienceDefaults,type Experience} from '../components/ExperienceSettings';
 
-const empty={id:'',name:'',description:'',profileType:'public',accent:'#6b5837',mode:'light',language:'en',density:'comfortable'};
+const empty={id:'',name:'',description:'',profileType:'public',accent:'#7d512f',mode:'light',language:'en',density:'comfortable'};
 type FormData=typeof empty;
 export default function Profiles({catalog,role}:{catalog:Catalog;role:Role}){
  const {data:items,error,isLoading}=useQuery({queryKey:['profiles'],queryFn:API.profiles});
@@ -19,7 +19,7 @@ export default function Profiles({catalog,role}:{catalog:Catalog;role:Role}){
  const selected=items?.find(p=>p.id===selection),profileType=watch('profileType');
  useEffect(()=>{
   if(newMode){reset(empty);setAllowed(['*']);setExperience(experienceDefaults('public'));return}
-  if(selected){reset({id:selected.id,name:selected.name,description:selected.description,profileType:selected.profileType,accent:String(selected.theme.accent||'#6b5837'),mode:String(selected.theme.mode||'light'),language:String(selected.theme.language||'en'),density:String(selected.theme.density||'comfortable')});setAllowed(selected.allowedSections||['*']);setExperience(experienceDefaults(selected.profileType,selected.experience))}
+  if(selected){reset({id:selected.id,name:selected.name,description:selected.description,profileType:selected.profileType,accent:String(selected.theme.accent||'#7d512f'),mode:String(selected.theme.mode||'light'),language:String(selected.theme.language||'en'),density:String(selected.theme.density||'comfortable')});setAllowed(selected.allowedSections||['*']);setExperience(experienceDefaults(selected.profileType,selected.experience))}
  },[newMode,selected,reset]);
  async function submit(values:FormData){
   if(!allowed.length){feedback.error(Error('Select at least one accessible page.'));return}
@@ -36,7 +36,7 @@ export default function Profiles({catalog,role}:{catalog:Catalog;role:Role}){
   <PageHeading eyebrow="TV EXPERIENCE / DISPLAY ASSIGNMENTS" title="Display Profiles" subtitle="Shape the layout, content and viewing rules for each audience."><Button icon={Plus} disabled={role!=='admin'} onClick={()=>setNewMode(true)}>New profile</Button></PageHeading>
   <div className="two-col-edit">
    <div><Card><div className="card-head"><div><h3>Available profiles</h3><p>Select the profile to edit</p></div></div>
-    <div className="profile-list">{(items||[]).map(p=><button className={`profile-choice ${selection===p.id&&!newMode?'selected':''}`} key={p.id} onClick={()=>{setSelection(p.id);setNewMode(false)}}><div className="profile-dot" style={{background:String(p.theme.accent||'#6b5837')}}/><div><strong>{p.name}</strong><small>{p.description}</small></div>{selection===p.id&&!newMode&&<Check size={17}/>}</button>)}</div>
+    <div className="profile-list">{(items||[]).map(p=><button className={`profile-choice ${selection===p.id&&!newMode?'selected':''}`} key={p.id} onClick={()=>{setSelection(p.id);setNewMode(false)}}><div className="profile-dot" style={{background:String(p.theme.accent||'#7d512f')}}/><div><strong>{p.name}</strong><small>{p.description}</small></div>{selection===p.id&&!newMode&&<Check size={17}/>}</button>)}</div>
     <div className="panel-hint">Profiles define permitted pages, layout and device history rules. Screen settings can override orientation.</div>
    </Card><RecommendationSummary/></div>
    <Card><div className="card-head"><div><h3>{newMode?'Create display profile':'Profile configuration'}</h3><p>Publishing creates a versioned update for the assigned screens.</p></div></div>

@@ -5,7 +5,7 @@ import { request } from "../api";
 import { Button, Card, PageHeading, useFeedback } from "../components/Common";
 import type { Catalog, Role } from "../types";
 
-const ACCENT = "#6b5837";
+const ACCENT = "#7d512f";
 const ACCENT_SOFT = "#f1ebe0";
 const LINE = "#e6e0d4";
 const FIELD_LINE = "#dcd5c7";

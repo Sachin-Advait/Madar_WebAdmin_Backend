@@ -1,0 +1,18 @@
+/* Madar brand: bronze from the admin login button, used across the admin. */
+:root{--bronze:#7d512f;--bronze-dark:#674025;--brand:#7d512f;--brand-light:#f1e8dc;--madar-bronze-grad:linear-gradient(105deg,#986b42,#674025)}
+body{background:#faf7f1}
+.btn-primary,.report-tabs button.active,.hero-cta{background:var(--madar-bronze-grad);border-color:#6f4a2c;color:#fffaf4;box-shadow:0 4px 12px #5e391f26,inset 0 1px 0 #ffffff55}
+.btn-primary:hover,.hero-cta:hover{background:#68452c}
+.side-link.selected{background:#f1e8dc;color:#7d512f}
+.side-link.selected:before{background:linear-gradient(180deg,#986b42,#674025)}
+.brand-logo,.tv-nav>img,.mini-screen-top>img,.pair-screen>img{filter:none}
+.sidebar-brand{gap:13px;align-items:center}
+.brand-symbol{display:block;height:38px;width:55px;overflow:hidden;flex-shrink:0}
+.sidebar .brand-logo{display:block;width:74px;max-width:none;height:auto;margin:-1px 0 0 -9px}
+.brand-caption{font-family:'DM Sans',Arial,sans-serif;font-size:22px;line-height:1.12;letter-spacing:-.65px;color:#382b23;font-weight:700;border-left:1px solid #d1c1ae;padding-left:14px}
+.brand-caption small{display:block;font-family:'DM Sans',Arial,sans-serif;font-size:10px;letter-spacing:1.8px;font-weight:700;color:#7d512f;margin-top:1px}
+.eyebrow,.control-kicker,.pill-bronze{color:#8a5f3c}
+.control-hero h2 em,.hero-copy h2 em{color:#7d512f}
+.trend-chart i{background:#d4b896}.trend-chart>div:last-child i{background:#7d512f}
+.delivery-bar{background:#c49a6c}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline-color:#ac752f}
