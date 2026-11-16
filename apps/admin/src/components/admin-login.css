@@ -76,13 +76,10 @@ body:has(.ih-login) { min-width: 0; }
   min-height: 545px; background: #8c7358; border-radius: 22px; box-shadow: 0 5px 18px #38251614;
 }
 .ih-login__picture, .ih-login__picture img, .ih-login__gallery::after { position: absolute; inset: 0; width: 100%; height: 100%; }
-.ih-login__picture { z-index: -3; transform: translateX(100%); transition: none; }
-.ih-login__picture--active, .ih-login__picture--out-left, .ih-login__picture--out-right { transition: transform .9s cubic-bezier(.65,0,.35,1); }
-.ih-login__picture--active { transform: translateX(0); z-index: -2; }
-.ih-login__picture--out-left, .ih-login__picture--wait-left { transform: translateX(-100%); }
-.ih-login__picture--out-right, .ih-login__picture--wait-right { transform: translateX(100%); }
+.ih-login__picture { z-index: -3; opacity: 0; transition: opacity 1.35s ease-in-out; }
+.ih-login__picture--active { opacity: 1; }
 .ih-login__picture img { object-fit: cover; object-position: 46% 50%; max-width: none; }
-.ih-login__picture--active img { animation: ih-architectural-pan 7s linear both; }
+.ih-login__picture--active img { animation: ih-architectural-pan 12s linear both; }
 .ih-login__gallery[data-motion="off"] .ih-login__picture img { animation-play-state: paused; }
 @keyframes ih-architectural-pan { from { transform: scale(1.015) translateX(.3%); } to { transform: scale(1.075) translateX(-.5%); } }
 .ih-login__gallery::after { content: ''; pointer-events: none; z-index: -1; background: linear-gradient(180deg,#291b1210 0%,transparent 37%,#26180f12 48%,#27190ecf 100%); }

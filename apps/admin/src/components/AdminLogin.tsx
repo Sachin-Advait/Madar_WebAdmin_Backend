@@ -40,8 +40,6 @@ type Props = {
 export default function AdminLogin({ onSubmit, initialEmail = '', onExploreDemo }: Props) {
   const lang = 'en' as Language;
   const [slide, setSlide] = useState(0);
-  const [previous, setPrevious] = useState<number | null>(null);
-  const [direction, setDirection] = useState(1);
   const [motion, setMotion] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [visible, setVisible] = useState(false);
   const [email, setEmail] = useState(initialEmail);
@@ -59,18 +57,11 @@ export default function AdminLogin({ onSubmit, initialEmail = '', onExploreDemo 
   }, []);
   useEffect(() => {
     if (!motion) return;
-    const timer = window.setTimeout(() => selectSlide(1), 7000);
+    const timer = window.setTimeout(() => selectSlide(1), 12000);
     return () => window.clearTimeout(timer);
   }, [slide, motion]);
   function selectSlide(offset: number) {
-    setDirection(offset < 0 ? -1 : 1);
-    setPrevious(slide);
     setSlide((slide + offset + images.length) % images.length);
-  }
-  function pictureClass(index: number) {
-    if (index === slide) return ' ih-login__picture--active';
-    if (index === previous) return direction > 0 ? ' ih-login__picture--out-left' : ' ih-login__picture--out-right';
-    return direction > 0 ? ' ih-login__picture--wait-right' : ' ih-login__picture--wait-left';
   }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -128,7 +119,7 @@ export default function AdminLogin({ onSubmit, initialEmail = '', onExploreDemo 
           </div>
         </section>
         <figure className="ih-login__gallery" aria-label={t.gallery} data-motion={motion ? 'on' : 'off'}>
-          {images.map((src, index) => <div className={'ih-login__picture'+pictureClass(index)}
+          {images.map((src, index) => <div className={'ih-login__picture'+(index === slide ? ' ih-login__picture--active' : '')}
             key={src} aria-hidden="true"><img src={src} alt="" fetchPriority={index === 0 ? 'high' : 'auto'}/></div>)}
           <button type="button" className="ih-login__motion" aria-label={motion ? t.pause : t.play}
             title={motion ? t.pause : t.play} onClick={() => setMotion(value => !value)}>
