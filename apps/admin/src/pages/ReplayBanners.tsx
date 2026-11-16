@@ -776,8 +776,8 @@ export default function ReplayBanners({
     <>
       <PageHeading
         eyebrow="CONTENT MANAGEMENT"
-        title="Banners"
-        subtitle="Hero banners for the TV Home and Replay pages."
+        title="Featured Programmes"
+        subtitle="Banners that slide at the top of the TV Replay page."
       />
       {tabs}
       <div className="rb-list-head">
