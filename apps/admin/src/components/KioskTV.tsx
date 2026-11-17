@@ -11,7 +11,9 @@ import {
   Timer,
   Users,
 } from "lucide-react";
-import type { LayoutSection } from "../types";
+import { useQuery } from "@tanstack/react-query";
+import { API } from "../api";
+import type { LayoutSection, Resource } from "../types";
 import { SPACEHUB_PAGE, type KioskPage } from "../kioskData";
 
 const ICON = "/kiosk/";
@@ -138,17 +140,143 @@ function Ticker({
   );
 }
 
+/** Videos from the Video Library, shared by the carousel and its picker. */
+function useLibraryVideos() {
+  return useQuery({
+    queryKey: ["resources", "videos"],
+    queryFn: () => API.resources("videos"),
+    staleTime: 60_000,
+  });
+}
+const playable = (v?: Resource) =>
+  typeof v?.videoRef === "string" && /^(https?:)?\//.test(v.videoRef)
+    ? v.videoRef
+    : "";
+const pickedIds = (section: LayoutSection) =>
+  Array.isArray(section.props.videoIds)
+    ? (section.props.videoIds as string[])
+    : [];
+
 function Videos({ section }: { section: LayoutSection }) {
   const h =
     { compact: 300, standard: 400, large: 520 }[String(section.props.height)] ??
     400;
+  const { data: library = [] } = useLibraryVideos();
+  const ids = pickedIds(section);
+  const videos = ids
+    .map((id) => library.find((v) => v.id === id))
+    .filter((v): v is Resource => !!v);
+  const [index, setIndex] = useState(0);
+  const current = videos.length ? videos[index % videos.length] : undefined;
+  const src = playable(current);
+  // Without a playable file, step to the next poster every 6 seconds.
+  useEffect(() => {
+    if (videos.length < 2 || src) return;
+    const t = setTimeout(() => setIndex((i) => i + 1), 6000);
+    return () => clearTimeout(t);
+  }, [videos.length, src, index]);
+  const next = () => setIndex((i) => i + 1);
   return (
     <div className="kiosk-video" style={{ "--h": h } as React.CSSProperties}>
-      <img src="/art/horizon.svg" alt="" />
-      <span className="kiosk-video-play">
-        <Play fill="currentColor" />
-      </span>
-      <small>{String(section.props.label || "Video playlist")}</small>
+      {current && src ? (
+        <video
+          key={current.id}
+          src={src}
+          poster={current.image || undefined}
+          autoPlay
+          muted
+          playsInline
+          loop={videos.length < 2}
+          onEnded={next}
+          onError={next}
+        />
+      ) : (
+        <img src={current?.image || "/art/horizon.svg"} alt="" />
+      )}
+      {!src && (
+        <span className="kiosk-video-play">
+          <Play fill="currentColor" />
+        </span>
+      )}
+      <small>
+        {current
+          ? current.title
+          : String(section.props.label || "Video playlist") +
+            " · choose videos in Widget Properties"}
+      </small>
+      {videos.length > 1 && (
+        <span className="kiosk-video-dots">
+          {videos.map((v, i) => (
+            <i
+              key={v.id}
+              className={i === index % videos.length ? "is-on" : ""}
+            />
+          ))}
+        </span>
+      )}
+    </div>
+  );
+}
+
+/** Lets the editor choose Video Library items for a board's carousel. */
+export function KioskVideoPicker({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: string[];
+  onChange: (ids: string[]) => void;
+  disabled?: boolean;
+}) {
+  const { data: library = [], isLoading } = useLibraryVideos();
+  const [query, setQuery] = useState("");
+  const shown = library.filter((v) =>
+    v.title.toLowerCase().includes(query.trim().toLowerCase()),
+  );
+  const toggle = (id: string) =>
+    onChange(
+      value.includes(id) ? value.filter((x) => x !== id) : [...value, id],
+    );
+  return (
+    <div className="kiosk-picker">
+      <div className="kiosk-picker-head">
+        <strong>Videos</strong>
+        <span>
+          {value.length
+            ? `${value.length} selected, played in the order you pick`
+            : "None selected"}
+        </span>
+      </div>
+      <input
+        type="search"
+        placeholder="Search Video Library"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+      <div className="kiosk-picker-list">
+        {isLoading && <p>Loading videos…</p>}
+        {!isLoading && !library.length && (
+          <p>No videos yet. Add them in Video Library.</p>
+        )}
+        {shown.map((v) => {
+          const n = value.indexOf(v.id);
+          return (
+            <label key={v.id} className={n >= 0 ? "is-on" : ""}>
+              <input
+                type="checkbox"
+                checked={n >= 0}
+                disabled={disabled}
+                onChange={() => toggle(v.id)}
+              />
+              <span className="kiosk-picker-thumb">
+                {v.image ? <img src={v.image} alt="" /> : <Play size={14} />}
+              </span>
+              <span className="kiosk-picker-title">{v.title}</span>
+              {n >= 0 && <b>{n + 1}</b>}
+            </label>
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -173,7 +173,9 @@
   margin: 0;
   border-radius: calc(20 * var(--u));
 }
-.kiosk-video img {
+.kiosk-video img,
+.kiosk-video video {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -202,6 +204,112 @@
   color: #fff;
   font-size: calc(20 * var(--u));
   font-weight: 600;
+}
+
+.kiosk-video small {
+  right: calc(24 * var(--u));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+.kiosk-video-dots {
+  position: absolute;
+  right: calc(24 * var(--u));
+  top: calc(18 * var(--u));
+  display: flex;
+  gap: calc(6 * var(--u));
+}
+.kiosk-video-dots i {
+  width: calc(10 * var(--u));
+  height: calc(10 * var(--u));
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+}
+.kiosk-video-dots i.is-on {
+  background: #fff;
+}
+
+/* Video picker in Widget Properties */
+.kiosk-picker {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+}
+.kiosk-picker-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+}
+.kiosk-picker-head span {
+  color: #8a7d68;
+  font-size: 11px;
+}
+.kiosk-picker input[type="search"] {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #e3d9c6;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+}
+.kiosk-picker-list {
+  display: grid;
+  gap: 6px;
+  max-height: 320px;
+  overflow: auto;
+}
+.kiosk-picker-list p {
+  margin: 4px 0;
+  color: #8a7d68;
+  font-size: 12px;
+}
+.kiosk-picker-list label {
+  display: grid;
+  grid-template-columns: auto 44px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid #ece4d4;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12.5px;
+}
+.kiosk-picker-list label.is-on {
+  border-color: #b8925a;
+  background: #fbf5ea;
+}
+.kiosk-picker-thumb {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 28px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #efe7d8;
+  color: #8e6a32;
+}
+.kiosk-picker-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.kiosk-picker-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.kiosk-picker-list b {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #8e6a32;
+  color: #fff;
+  font-size: 11px;
 }
 
 /* SpaceHub */

@@ -56,6 +56,7 @@ const video = {
   type: "object",
   properties: {
     label: { type: "string", title: "Playlist name" },
+    // The videos are chosen with the picker under the form.
     height: {
       type: "string",
       title: "Height",
@@ -121,7 +122,7 @@ const DEFS: Record<string, Def> = {
   sh_videos: {
     label: "Video carousel",
     page: SPACEHUB_PAGE,
-    defaults: { label: "Welcome video", height: "standard" },
+    defaults: { label: "Welcome video", height: "standard", videoIds: [] },
     schema: video,
   },
   sh_ticker: {
@@ -184,7 +185,7 @@ const DEFS: Record<string, Def> = {
   sq_videos: {
     label: "Video carousel",
     page: SERVEIQ_PAGE,
-    defaults: { label: "Welcome video", height: "standard" },
+    defaults: { label: "Welcome video", height: "standard", videoIds: [] },
     schema: video,
   },
   sq_ticker: {
@@ -196,6 +197,8 @@ const DEFS: Record<string, Def> = {
 };
 
 export const isKioskType = (type: string) => type in DEFS;
+export const isKioskVideoType = (type: string) =>
+  type === "sh_videos" || type === "sq_videos";
 /** Grid columns (of 12) a board section takes on the portrait canvas. */
 export const kioskWidth = (type: string) => DEFS[type]?.width ?? 12;
 
