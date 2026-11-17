@@ -7,6 +7,7 @@ import {createApp,authenticateDevice} from './app.mjs';
 import {dispatchDue} from './releases.mjs';
 import {DeliveryStream} from './delivery-stream.mjs';
 import {purgeExpiredPreferences} from './preferences.mjs';
+import {attachRemote} from './remote.mjs';
 const logger=pino({redact:['req.headers.authorization','req.headers.cookie','req.headers.x-screen-key']});
 const production=process.env.NODE_ENV==='production',demo=process.env.MADAR_DEMO==='1';
 if(production&&demo)throw Error('MADAR_DEMO must be disabled in production');
@@ -20,6 +21,8 @@ const io=new Server(server,{maxHttpBufferSize:8192,transports:['websocket'],cors
 io.use(async(socket,next)=>{try{const s=await authenticateDevice(db,socket.handshake.auth?.deviceKey);socket.data.screenId=s.id;next()}catch{next(Error('Invalid device credential'))}});
 io.on('connection',socket=>{socket.join(socket.data.screenId);socket.emit('sync-required',{reason:'connected'})});
 if(redis){const {createAdapter}=await import('@socket.io/redis-adapter');sub=redis.duplicate();sub.on('error',e=>logger.warn({message:e.message},'Redis subscriber unavailable'));await sub.connect();io.adapter(createAdapter(redis,sub))}
+// Phone remotes: /remote namespace for phones, commands to TV sockets.
+const remote=attachRemote({io,db,events:app.locals.events,app,logger});
 const emit=(id,payload)=>{io.to(id).emit('sync-required',payload)};
 // Notifications and ticker changes reach every connected TV at once.
 app.locals.events.on('live',kind=>io.emit('live-update',{kind}));
@@ -32,5 +35,5 @@ const preferenceTimer=setInterval(preferenceMaintenance,60000);preferenceMainten
 const timer=setInterval(deliveryTick,1000);
 deliveryTick();
 const port=Number(process.env.PORT||8000);server.listen(port,process.env.HOST||'127.0.0.1',()=>logger.info({url:'http://127.0.0.1:'+port,database:db.engine,demo,delivery:delivery?'redis-streams':'sql-development'},'MADAR ready'));
-let stopping=false;async function stop(){if(stopping)return;stopping=true;clearInterval(timer);clearInterval(preferenceTimer);server.close();await new Promise(resolve=>io.close(resolve));while(working||pruning)await new Promise(r=>setTimeout(r,50));await sub?.quit();await redis?.quit();await db.close();process.exit(0)}
+let stopping=false;async function stop(){if(stopping)return;stopping=true;clearInterval(timer);clearInterval(preferenceTimer);remote.stop();server.close();await new Promise(resolve=>io.close(resolve));while(working||pruning)await new Promise(r=>setTimeout(r,50));await sub?.quit();await redis?.quit();await db.close();process.exit(0)}
 process.on('SIGTERM',stop);process.on('SIGINT',stop);

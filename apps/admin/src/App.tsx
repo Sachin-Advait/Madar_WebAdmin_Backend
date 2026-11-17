@@ -18,6 +18,7 @@ const ContentManager=React.lazy(()=>import('./pages/ContentManager'));
 const Banners=React.lazy(()=>import('./pages/Banners'));
 const Notifications=React.lazy(()=>import('./pages/Notifications'));
 const BreakingNews=React.lazy(()=>import('./pages/BreakingNews'));
+const PhoneRemotes=React.lazy(()=>import('./pages/PhoneRemotes'));
 import Profiles from './pages/Profiles';
 import Screens from './pages/Screens';
 import Schedules from './pages/Schedules';
@@ -78,6 +79,7 @@ function Studio({user,onLogout}:{user:User;onLogout:()=>void}){
   if(view==='reports')return <Reports role={user.role}/>;
   if(view==='notifications')return <Notifications role={user.role}/>;
   if(view==='breaking-news')return <BreakingNews role={user.role}/>;
+  if(view==='phone-remotes')return <PhoneRemotes role={user.role}/>;
   if(view==='delivery')return <Delivery role={user.role}/>;
   if(view==='integrations')return <Integrations role={user.role}/>;
   if(view==='assets')return <Integrations assets role={user.role}/>;

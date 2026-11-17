@@ -29,6 +29,7 @@ import {preferencePolicy,clearDevicePreferences,playbackRevision} from './prefer
 import {registerSourceImportRoutes} from './source-import-routes.mjs';
 import {importedMediaUrl,mediaUrl} from './source-import.mjs';
 import {registerNotificationRoutes} from './notification-routes.mjs';
+import {registerRemoteRoutes} from './remote.mjs';
 import {registerNewsRoutes,tickerSettings} from './news-routes.mjs';
 import {createOdooService,registerOdooRoutes,odooPublic,odooSettings} from './odoo.mjs';
 import {createDisplayConnectors,registerDisplayConnectorRoutes,connectorPublic,connectorSettings} from './display-connectors.mjs';
@@ -98,6 +99,7 @@ export function createApp({db,demo=false,odooFetch,connectorFetch,redis=null,log
  registerPreferenceRoutes(app,{db,admin,device,wrap});
  registerSourceImportRoutes(app,{db,admin,wrap,validateLinks});
   registerNotificationRoutes(app,{db,admin,device,wrap});
+  registerRemoteRoutes(app,{db,admin,wrap,limiter});
   registerNewsRoutes(app,{db,admin,device,wrap});
   const odoo=createOdooService({db,demo,...(odooFetch?{fetchImpl:odooFetch}:{})});
   registerOdooRoutes(app,{db,admin,wrap,service:odoo,audit,releaseAll});
