@@ -2347,6 +2347,83 @@ a {
   background: color-mix(in srgb, var(--cat) 10%, #fff);
   color: #2f3a43;
 }
+.notification-category.is-fire {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--cat);
+  border-color: var(--cat);
+  color: #fff;
+}
+.notification-category.is-fire:before {
+  display: none;
+}
+.notification-category.is-fire.selected {
+  background: var(--cat);
+  color: #fff;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cat) 25%, transparent);
+}
+.fire-alarm-head {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border-left: 4px solid var(--cat);
+  background: color-mix(in srgb, var(--cat) 7%, #fff);
+  color: var(--cat);
+}
+.fire-alarm-head > div {
+  flex: 1;
+}
+.fire-alarm-state {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 20px;
+  background: #eef0f2;
+  color: #6b7782;
+  white-space: nowrap;
+}
+.fire-alarm-state.is-on {
+  background: var(--cat);
+  color: #fff;
+}
+.fire-alarm-summary {
+  display: grid;
+  gap: 3px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--cat) 35%, #fff);
+  font-size: 12px;
+  color: #5d6873;
+}
+.fire-alarm-summary strong {
+  color: var(--cat);
+}
+.fire-alarm-dot {
+  margin-left: 4px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.25);
+  font-size: 9px;
+  letter-spacing: 0.4px;
+}
+.fire-alarm-head div {
+  display: grid;
+  gap: 3px;
+}
+.fire-alarm-head strong {
+  color: #2f3a43;
+  font-size: 13px;
+}
+.fire-alarm-head span {
+  color: #5d6873;
+  font-size: 11.5px;
+  line-height: 1.5;
+}
 .notification-preview {
   border-radius: 10px;
   padding: 16px 18px;
