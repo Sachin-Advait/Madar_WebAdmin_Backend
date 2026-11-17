@@ -230,9 +230,9 @@ function SectionBadge({ icon, label }: { icon: string; label: string }) {
   return (
     <div
       className="sh-badge sh-badge-wide"
-      style={{ "--c": "rgba(255,255,255,.8)" } as React.CSSProperties}
+      style={{ "--c": "rgba(59,49,33,.85)" } as React.CSSProperties}
     >
-      <Glyph name={icon} size={30} color="rgba(255,255,255,.8)" />
+      <Glyph name={icon} size={30} color="rgba(59,49,33,.85)" />
       <span>{label}</span>
     </div>
   );
@@ -280,7 +280,7 @@ function RoomCard({
     >
       <strong className="sh-room-name">{room.name}</strong>
       <div className="sh-room-cap">
-        {dept ? <Glyph name="department" size={20} color="#fff" /> : <Users />}
+        {dept ? <Glyph name="department" size={20} color="#3b3121" /> : <Users />}
         {!dept && <span>Capacity</span>}
         <b>{dept ? room.dept : room.capacity}</b>
       </div>
