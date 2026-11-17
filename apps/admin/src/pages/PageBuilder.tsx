@@ -67,11 +67,16 @@ import {
   KIOSK_PAGE_OF,
   isKioskPage,
   isKioskType,
+  isKioskVideoType,
   kioskApi,
   kioskWidth,
   withKioskBoards,
 } from "../kioskData";
-import { KioskFrame, KioskWidget } from "../components/KioskTV";
+import {
+  KioskFrame,
+  KioskVideoPicker,
+  KioskWidget,
+} from "../components/KioskTV";
 
 const PREVIEW_PREFIX = "preview:";
 const PALETTE_PREFIX = "palette:";
@@ -858,6 +863,21 @@ export default function PageBuilder({
                     >
                       <></>
                     </Form>
+                    {isKioskVideoType(selected.type) && (
+                      <KioskVideoPicker
+                        value={
+                          Array.isArray(selected.props.videoIds)
+                            ? (selected.props.videoIds as string[])
+                            : []
+                        }
+                        disabled={!canEdit}
+                        onChange={(videoIds) =>
+                          changeSection(selected.id, {
+                            props: { ...selected.props, videoIds },
+                          })
+                        }
+                      />
+                    )}
                   </div>
                   <div className="properties-note">
                     Widget settings are checked again by the API before saving.
