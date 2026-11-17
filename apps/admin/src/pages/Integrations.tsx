@@ -5,13 +5,14 @@ import {ArrowUpRight,Cable,CalendarClock,FileImage,Headset,KeyRound,ListChecks,M
 import {API,request} from '../api';
 import {adminHash} from '../navigation';
 import {PageHeading,Card,Status,useFeedback,Button,FormField,copyText} from '../components/Common';
+import {PROFILE_TYPES} from '../profileTypes';
 
 type OdooSettings={enabled:boolean;url:string;database:string;username:string;timezone:string;effectiveTimezone:string;taskScope:'deadline'|'created';weekStart:'sunday'|'monday'|'saturday';helpdesk:boolean;tasks:boolean;profiles:string[];apiKeyConfigured:boolean;apiKeyFromEnvironment:boolean;configured:boolean;status?:Record<string,{lastSuccessAt?:string;lastError?:string}>};
 type OdooForm=Omit<OdooSettings,'effectiveTimezone'|'apiKeyConfigured'|'apiKeyFromEnvironment'|'configured'|'status'>&{apiKey:string;clearApiKey:boolean};
 type TestResult={uid:number;helpdesk?:any;tasks?:any};
 type ConnectorId='spacehub'|'serveiq';
 type ConnectorSettings={enabled:boolean;url:string;email?:string;branchId?:string;configured:boolean;passwordConfigured?:boolean;passwordFromEnvironment?:boolean;status?:{lastSuccessAt?:string;lastError?:string}};
-const profiles=[['public','Public / Visitor'],['employee','Employee'],['management','Management'],['vip','VIP Lounge'],['signage','Dedicated Signage']];
+const profiles=PROFILE_TYPES;
 const go=(id:string)=>{window.location.hash=adminHash(id)};
 
 export default function Integrations({assets=false,role}:{assets?:boolean;role:string}){

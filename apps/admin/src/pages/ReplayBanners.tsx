@@ -46,6 +46,8 @@ const PROFILE_TYPES = [
   { id: "management", label: "Management" },
   { id: "vip", label: "VIP" },
   { id: "signage", label: "Signage" },
+  { id: "queue", label: "Queue Management" },
+  { id: "meeting", label: "Meeting Management" },
 ];
 
 type Draft = {

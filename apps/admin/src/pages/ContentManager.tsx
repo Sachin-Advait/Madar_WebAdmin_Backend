@@ -8,6 +8,7 @@ import {ArrowLeft,ArrowUpRight,FileImage,Filter,ImagePlus,MoreHorizontal,Plus,Se
 import {API,request} from '../api';
 import type {Catalog,Resource,Role} from '../types';
 import {Button,Card,Empty,ErrorBox,Loading,PageHeading,Status,useFeedback} from '../components/Common';
+import {PROFILE_TYPE_IDS} from '../profileTypes';
 
 const descriptions:Record<string,string>={
  channels:'Manage channel metadata, logos, EPG mappings and streaming references.',videos:'Curate video-on-demand content that the existing Flutter TV app can display.',
@@ -48,7 +49,7 @@ export default function ContentManager({kind,catalog,role,filter,tabs}:{kind:str
 
  if(role==='editor')editorSchema.properties.status.enum=['draft','review'];
  const label=catalog.resources[kind]?.label||kind;
- function startNew(){setDraft({title:'',titleAr:'',description:'',category:'',status:'draft',sortOrder:0,visibleTo:['public','employee','management','vip','signage']});setEditing(null);setCreate(true)}
+ function startNew(){setDraft({title:'',titleAr:'',description:'',category:'',status:'draft',sortOrder:0,visibleTo:[...PROFILE_TYPE_IDS]});setEditing(null);setCreate(true)}
  function startEdit(item:Resource){const {id,createdAt,updatedAt,revision,publishedStatus,...values}=item;setDraft(role==='editor'?{...values,status:'draft'}:values);setEditing(item);setCreate(true)}
  function cancel(){setCreate(false);setEditing(null)}
  async function save(values:Record<string,unknown>){setBusy(true);try{if(editing){await API.updateResource(kind,editing.id,{...values,revision:editing.revision});feedback.success(`${label} item updated`)}else{await API.addResource(kind,values);feedback.success(`${label} item created`)}await client.invalidateQueries({queryKey:['resources',kind]});await client.invalidateQueries({queryKey:['overview']});cancel()}catch(e){feedback.error(e)}finally{setBusy(false)}}

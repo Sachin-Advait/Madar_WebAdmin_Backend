@@ -63,6 +63,15 @@ import {
   isHubType,
   withInfoHub,
 } from "../infoHubData";
+import {
+  KIOSK_PAGE_OF,
+  isKioskPage,
+  isKioskType,
+  kioskApi,
+  kioskWidth,
+  withKioskBoards,
+} from "../kioskData";
+import { KioskFrame, KioskWidget } from "../components/KioskTV";
 
 const PREVIEW_PREFIX = "preview:";
 const PALETTE_PREFIX = "palette:";
@@ -118,7 +127,9 @@ function SortableSection({
   onDuplicate,
   onDelete,
   readOnly,
+  label,
 }: {
+  label?: string;
   section: LayoutSection;
   selected: boolean;
   onSelect: () => void;
@@ -154,7 +165,9 @@ function SortableSection({
       </span>
       <div className="section-card-text">
         <strong>
-          {String(section.props.title || section.type.replaceAll("_", " "))}
+          {String(
+            section.props.title || label || section.type.replaceAll("_", " "),
+          )}
         </strong>
         <small>
           {section.type} · {section.enabled ? "Visible" : "Hidden"}
@@ -263,12 +276,18 @@ export default function PageBuilder({
   catalog: Catalog;
   role: Role;
 }) {
-  const catalog = useMemo(() => withInfoHub(baseCatalog), [baseCatalog]);
+  const catalog = useMemo(
+    () => withKioskBoards(withInfoHub(baseCatalog)),
+    [baseCatalog],
+  );
   const canEdit = role !== "viewer",
     canPublish = role === "admin";
   const [page, setPage] = useState("home"),
     [profile, setProfile] = useState("management");
   const isHub = page === HUB_PAGE;
+  // SpaceHub / ServeIQ boards (Meeting and Queue Management profiles) are
+  // UI only: kept in this browser by kioskApi.
+  const isKiosk = isKioskPage(page);
   const [hubTab, setHubTab] = useState<HubTabId>("live");
   const [hubRange, setHubRange] = useState<HubRange>("today");
   const [sections, setSections] = useState<LayoutSection[]>([]);
@@ -285,7 +304,12 @@ export default function PageBuilder({
     error,
   } = useQuery({
     queryKey: ["layout", page, profile],
-    queryFn: () => (isHub ? hubApi.layout(profile) : API.layout(page, profile)),
+    queryFn: () =>
+      isKioskPage(page)
+        ? kioskApi.layout(page, profile)
+        : isHub
+          ? hubApi.layout(profile)
+          : API.layout(page, profile),
   });
   const { data: profiles } = useQuery({
     queryKey: ["profiles"],
@@ -294,13 +318,31 @@ export default function PageBuilder({
   const { data: versions } = useQuery({
     queryKey: ["versions", page, profile],
     queryFn: () =>
-      isHub ? hubApi.versions(profile) : API.versions(page, profile),
+      isKioskPage(page)
+        ? kioskApi.versions(page, profile)
+        : isHub
+          ? hubApi.versions(profile)
+          : API.versions(page, profile),
   });
   const { data: preview } = useQuery({
     queryKey: ["preview", page, profile, "draft"],
     queryFn: () => API.preview(page, profile, "draft"),
-    enabled: !isHub,
+    enabled: !isHub && !isKiosk,
   });
+  const profileType = (profiles || []).find(
+    (p) => p.id === profile,
+  )?.profileType;
+  const kioskPage = profileType ? KIOSK_PAGE_OF[profileType] : undefined;
+  // Meeting / Queue Management profiles build only their board; other
+  // profiles never see the boards.
+  useEffect(() => {
+    if (!profileType) return;
+    if (kioskPage && page !== kioskPage) setPage(kioskPage);
+    else if (!kioskPage && isKioskPage(page)) setPage("home");
+  }, [profileType, kioskPage, page]);
+  const pageOptions = Object.entries(catalog.pages).filter(([k]) =>
+    kioskPage ? k === kioskPage : !isKioskPage(k),
+  );
   useEffect(() => {
     if (!response) return;
     setSections(
@@ -353,7 +395,13 @@ export default function PageBuilder({
       layout: {
         x: 0,
         y: sections.length * 4,
-        w: HUB_WIDE[type] ? 12 : info.grid ? 6 : 12,
+        w: isKioskType(type)
+          ? kioskWidth(type)
+          : HUB_WIDE[type]
+            ? 12
+            : info.grid
+              ? 6
+              : 12,
         h: 4,
       },
     };
@@ -393,9 +441,11 @@ export default function PageBuilder({
     setSaving(true);
     try {
       const layout: PageLayout = { schemaVersion: 1, pageKey: page, sections };
-      const result = await (isHub
-        ? hubApi.saveLayout(profile, layout, response.revision)
-        : API.saveLayout(page, profile, layout, response.revision));
+      const result = await (isKioskPage(page)
+        ? kioskApi.saveLayout(page, profile, layout, response.revision)
+        : isHub
+          ? hubApi.saveLayout(profile, layout, response.revision)
+          : API.saveLayout(page, profile, layout, response.revision));
       feedback.success(`Draft saved • revision ${result.revision}`);
       await client.invalidateQueries({ queryKey: ["layout", page, profile] });
       await client.invalidateQueries({ queryKey: ["preview", page, profile] });
@@ -409,11 +459,15 @@ export default function PageBuilder({
     if (!response) return;
     setSaving(true);
     try {
-      const r = await (isHub
-        ? hubApi.publish(profile, response.revision)
-        : API.publish(page, profile, response.revision));
+      const r = await (isKioskPage(page)
+        ? kioskApi.publish(page, profile, response.revision)
+        : isHub
+          ? hubApi.publish(profile, response.revision)
+          : API.publish(page, profile, response.revision));
       feedback.success(
-        `Published version ${r.publishedVersion} to ${profile} screens`,
+        isKioskPage(page)
+          ? `Published version ${r.publishedVersion} (saved in this browser)`
+          : `Published version ${r.publishedVersion} to ${profile} screens`,
       );
       await client.invalidateQueries({ queryKey: ["layout", page, profile] });
       await client.invalidateQueries({ queryKey: ["versions", page, profile] });
@@ -426,14 +480,25 @@ export default function PageBuilder({
   async function restore() {
     if (versionToRestore === "") return;
     try {
-      await (isHub
-        ? hubApi.rollback(profile, Number(versionToRestore), response!.revision)
-        : API.rollback(
+      await (isKioskPage(page)
+        ? kioskApi.rollback(
             page,
             profile,
             Number(versionToRestore),
             response!.revision,
-          ));
+          )
+        : isHub
+          ? hubApi.rollback(
+              profile,
+              Number(versionToRestore),
+              response!.revision,
+            )
+          : API.rollback(
+              page,
+              profile,
+              Number(versionToRestore),
+              response!.revision,
+            ));
       feedback.success(
         "Older version restored to draft. Review and publish when ready.",
       );
@@ -482,7 +547,7 @@ export default function PageBuilder({
       <div className="workspace-toolbar">
         <FormField label="PAGE">
           <select value={page} onChange={(e) => setPage(e.target.value)}>
-            {Object.entries(catalog.pages).map(([k, v]) => (
+            {pageOptions.map(([k, v]) => (
               <option key={k} value={k}>
                 {v}
               </option>
@@ -554,6 +619,7 @@ export default function PageBuilder({
                       <SortableSection
                         key={s.id}
                         section={s}
+                        label={catalog.widgets[s.type]?.label}
                         selected={selectedId === s.id}
                         onSelect={() => pick(s.id)}
                         onToggle={() =>
@@ -600,67 +666,115 @@ export default function PageBuilder({
                 </div>
                 <span className="preview-tag">DRAFT</span>
               </div>
+              {isKiosk && (
+                <div className="info-strip kiosk-note">
+                  <Monitor size={16} />
+                  <span>
+                    UI only for now. This board is saved in this browser with
+                    sample data, and is not sent to TVs yet.
+                  </span>
+                </div>
+              )}
               <div className="tv-preview-wrap">
-                <TVFrame
-                  page={catalog.pages[page]?.split(" / ")[0] || "Home"}
-                  demo={catalog.demo}
-                >
-                  <DropZone id="preview-canvas" className="preview-drop-zone">
-                    {isHub && (
-                      <HubHeader
-                        tab={hubTab}
-                        onTab={setHubTab}
-                        range={hubRange}
-                        onRange={setHubRange}
-                        context={`${profileName} display · Headquarters`}
-                      />
-                    )}
-                    <SortableContext
-                      items={previewSections.map(
-                        (s) => `${PREVIEW_PREFIX}${s.id}`,
-                      )}
-                      strategy={
-                        isHub
-                          ? rectSortingStrategy
-                          : verticalListSortingStrategy
-                      }
-                    >
-                      <div className={isHub ? "hub-grid" : undefined}>
-                        {previewSections.map((s) => (
-                          <PreviewSortable
-                            key={s.id}
-                            id={s.id}
-                            selected={selectedId === s.id}
-                            onSelect={() => pick(s.id)}
-                            readOnly={!canEdit}
-                            className={HUB_WIDE[s.type] ? "hub-wide" : ""}
-                          >
-                            {isHubType(s.type) ? (
-                              <HubWidget section={s} range={hubRange} />
-                            ) : (
-                              <WidgetCard
-                                compact
-                                section={{
-                                  ...s,
-                                  source: catalog.widgets[s.type]?.source || "",
-                                  data:
-                                    preview?.sections.find((v) => v.id === s.id)
-                                      ?.data ?? [],
-                                }}
+                {isKioskPage(page) ? (
+                  <KioskFrame page={page}>
+                    <DropZone id="preview-canvas" className="preview-drop-zone">
+                      <SortableContext
+                        items={previewSections.map(
+                          (s) => `${PREVIEW_PREFIX}${s.id}`,
+                        )}
+                        strategy={rectSortingStrategy}
+                      >
+                        <div className="kiosk-grid">
+                          {previewSections.map((s) => (
+                            <PreviewSortable
+                              key={s.id}
+                              id={s.id}
+                              selected={selectedId === s.id}
+                              onSelect={() => pick(s.id)}
+                              readOnly={!canEdit}
+                              className={`kiosk-span-${kioskWidth(s.type)}`}
+                            >
+                              <KioskWidget
+                                section={s}
+                                page={page}
+                                sections={sections}
                               />
-                            )}
-                          </PreviewSortable>
-                        ))}
-                      </div>
-                    </SortableContext>
-                    {!previewSections.length && (
-                      <div className="preview-drop-hint">
-                        Drop a widget here
-                      </div>
-                    )}
-                    {isHub && <HubFooter />}
-                  </DropZone>
-                </TVFrame>
+                            </PreviewSortable>
+                          ))}
+                        </div>
+                      </SortableContext>
+                      {!previewSections.length && (
+                        <div className="preview-drop-hint">
+                          Drop a widget here
+                        </div>
+                      )}
+                    </DropZone>
+                  </KioskFrame>
+                ) : (
+                  <TVFrame
+                    page={catalog.pages[page]?.split(" / ")[0] || "Home"}
+                    demo={catalog.demo}
+                  >
+                    <DropZone id="preview-canvas" className="preview-drop-zone">
+                      {isHub && (
+                        <HubHeader
+                          tab={hubTab}
+                          onTab={setHubTab}
+                          range={hubRange}
+                          onRange={setHubRange}
+                          context={`${profileName} display · Headquarters`}
+                        />
+                      )}
+                      <SortableContext
+                        items={previewSections.map(
+                          (s) => `${PREVIEW_PREFIX}${s.id}`,
+                        )}
+                        strategy={
+                          isHub
+                            ? rectSortingStrategy
+                            : verticalListSortingStrategy
+                        }
+                      >
+                        <div className={isHub ? "hub-grid" : undefined}>
+                          {previewSections.map((s) => (
+                            <PreviewSortable
+                              key={s.id}
+                              id={s.id}
+                              selected={selectedId === s.id}
+                              onSelect={() => pick(s.id)}
+                              readOnly={!canEdit}
+                              className={HUB_WIDE[s.type] ? "hub-wide" : ""}
+                            >
+                              {isHubType(s.type) ? (
+                                <HubWidget section={s} range={hubRange} />
+                              ) : (
+                                <WidgetCard
+                                  compact
+                                  section={{
+                                    ...s,
+                                    source:
+                                      catalog.widgets[s.type]?.source || "",
+                                    data:
+                                      preview?.sections.find(
+                                        (v) => v.id === s.id,
+                                      )?.data ?? [],
+                                  }}
+                                />
+                              )}
+                            </PreviewSortable>
+                          ))}
+                        </div>
+                      </SortableContext>
+                      {!previewSections.length && (
+                        <div className="preview-drop-hint">
+                          Drop a widget here
+                        </div>
+                      )}
+                      {isHub && <HubFooter />}
+                    </DropZone>
+                  </TVFrame>
+                )}
               </div>
               <div className="canvas-bottom">
                 <p>

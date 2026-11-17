@@ -6,6 +6,7 @@ import {API} from '../api';
 import type {Catalog,Role,TVProfile} from '../types';
 import {Button,Card,ErrorBox,FormField,Loading,PageHeading,useFeedback} from '../components/Common';
 import {ExperienceSettings,RecommendationSummary,experienceDefaults,type Experience} from '../components/ExperienceSettings';
+import {PROFILE_TYPES} from '../profileTypes';
 
 const empty={id:'',name:'',description:'',profileType:'public',accent:'#7d512f',mode:'light',language:'en',density:'comfortable'};
 type FormData=typeof empty;
@@ -43,9 +44,9 @@ export default function Profiles({catalog,role}:{catalog:Catalog;role:Role}){
     <form onSubmit={handleSubmit(submit)} className="normal-form"><fieldset disabled={role!=='admin'||busy} style={{border:0,padding:0,margin:0,minWidth:0}}>
      <div className="form-grid"><FormField label="Profile ID"><input {...register('id',{required:true})} readOnly={!newMode} required pattern="[a-z][a-z0-9-]{1,50}" placeholder="e.g. branch-a"/></FormField><FormField label="Profile name"><input {...register('name',{required:true})} minLength={2} maxLength={99} required/></FormField></div>
      <FormField label="Description"><textarea rows={2} {...register('description')}/></FormField>
-     <div className="form-grid"><FormField label="Profile type"><select {...register('profileType')}><option value="public">Public / Visitor</option><option value="employee">Employee</option><option value="management">Management</option><option value="vip">VIP Lounge</option><option value="signage">Dedicated Signage</option></select></FormField><FormField label="Interface theme"><select {...register('mode')}><option value="light">Light</option><option value="dark">Dark</option></select></FormField><FormField label="Accent color"><input type="color" {...register('accent')}/></FormField><FormField label="Language"><select {...register('language')}><option value="en">English</option><option value="ar">Arabic</option></select></FormField></div>
+     <div className="form-grid"><FormField label="Profile type"><select {...register('profileType')}>{PROFILE_TYPES.map(([id,label])=><option key={id} value={id}>{label}</option>)}</select></FormField><FormField label="Interface theme"><select {...register('mode')}><option value="light">Light</option><option value="dark">Dark</option></select></FormField><FormField label="Accent color"><input type="color" {...register('accent')}/></FormField><FormField label="Language"><select {...register('language')}><option value="en">English</option><option value="ar">Arabic</option></select></FormField></div>
      <ExperienceSettings value={experience} onChange={setExperience}/>
-     {['public','vip','signage'].includes(profileType)&&experience.historyMode==='device'&&<div className="info-strip">Persistent history is enabled for a shared audience. Resume and interests will be shared by everyone using each assigned device.</div>}
+     {['public','vip','signage','queue','meeting'].includes(profileType)&&experience.historyMode==='device'&&<div className="info-strip">Persistent history is enabled for a shared audience. Resume and interests will be shared by everyone using each assigned device.</div>}
      <div className="access-pages"><strong>Accessible TV pages</strong><label className="checkline"><input type="checkbox" checked={allowed.includes('*')} onChange={e=>setAllowed(e.target.checked?['*']:[])} /> All pages</label><div className="page-allow-list">{Object.entries(catalog.pages).map(([k,name])=><label key={k} className="checkline"><input disabled={allowed.includes('*')} type="checkbox" checked={allowed.includes('*')||allowed.includes(k)} onChange={e=>setAllowed(x=>e.target.checked?[...x,k]:x.filter(a=>a!==k))}/>{name}</label>)}</div></div>
      <div className="form-actions"><Button icon={Save} type="submit" loading={busy}>{newMode?'Create profile':'Publish profile'}</Button></div>
     </fieldset></form>

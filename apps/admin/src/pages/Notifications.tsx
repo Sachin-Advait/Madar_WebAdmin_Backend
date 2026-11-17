@@ -14,6 +14,7 @@ import {
   Status,
   useFeedback,
 } from "../components/Common";
+import { PROFILE_TYPES } from "../profileTypes";
 
 export const notificationCategories = [
   {
@@ -73,13 +74,7 @@ const empty = {
 const when = (v: string) => new Date(v).toLocaleString();
 
 export const fireAlarmColor = "#e0201b";
-const tvProfiles = [
-  ["public", "Public / Visitor"],
-  ["employee", "Employee"],
-  ["management", "Management"],
-  ["vip", "VIP Lounge"],
-  ["signage", "Dedicated Signage"],
-] as const;
+const tvProfiles = PROFILE_TYPES;
 type FireAlarm = {
   enabled: boolean;
   profiles: string[];

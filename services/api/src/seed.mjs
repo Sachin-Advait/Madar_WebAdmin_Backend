@@ -1,21 +1,42 @@
 import {experienceDefaults} from './experience-config.mjs';
 import {enrichDemo} from './sample-data.mjs';
-import {catalog,uid,hashPassword,validPassword,profileTypes,sha} from './domain.mjs';
+import {catalog,uid,hashPassword,validPassword,profileTypes,profileTypeNames,sha} from './domain.mjs';
 import {one,rows} from './db.mjs';
 import {releaseAll,releaseProfile} from './releases.mjs';
+/** The profile each profile type starts with. */
+function defaultProfile(type){
+  const p={id:type,name:profileTypeNames[type],description:{public:'Welcoming spaces and public information',employee:'Internal communication and learning',management:'Operations and executive information',vip:'Curated hospitality and premium media',signage:'Focused meeting and queue boards',queue:'ServeIQ queue board: now calling, counters and upcoming tokens',meeting:'SpaceHub meeting board: room status, current and upcoming meetings'}[type],profileType:type,theme:{accent:'#6b5837',mode:'light',language:'en',density:'comfortable'},allowedSections:['*']};
+  p.experience=experienceDefaults(p);
+  return p;
+}
+// Profile types added after the first release (Queue and Meeting Management)
+// get their default profile once on existing installs.
+async function addNewProfileTypes(tx){
+ if(await one(tx,"SELECT key FROM settings WHERE key='profileTypesQueueMeeting'"))return;
+ for(const type of ['queue','meeting']){
+  if(await one(tx,'SELECT id FROM profiles WHERE id=$1',[type]))continue;
+  await tx.query('INSERT INTO profiles(id,payload) VALUES($1,$2)',[type,JSON.stringify(defaultProfile(type))]);
+  for(const [page,l] of Object.entries(catalog.defaults)){
+   await tx.query('INSERT INTO layouts(page_key,profile_id,draft,published,published_version) VALUES($1,$2,$3,$3,1) ON CONFLICT(page_key,profile_id) DO NOTHING',[page,type,JSON.stringify(l)]);
+   await tx.query('INSERT INTO layout_versions(page_key,profile_id,version,layout,published_by) VALUES($1,$2,1,$3,$4) ON CONFLICT DO NOTHING',[page,type,JSON.stringify(l),'initialization']);
+  }
+  await releaseProfile(tx,type,'Added the '+profileTypeNames[type]+' profile');
+ }
+ await tx.query("INSERT INTO settings(key,value) VALUES('profileTypesQueueMeeting','true') ON CONFLICT(key) DO NOTHING");
+}
+
 export async function seed(db,{demo=false,password=process.env.BOOTSTRAP_PASSWORD,email=process.env.BOOTSTRAP_EMAIL||'admin@madar.local'}={}){
  if(!await one(db,'SELECT id FROM users LIMIT 1')){
    if(!password&&demo)password='MadarDemo!2026#';
    if(password){validPassword(password);await db.query('INSERT INTO users(id,email,name,role,password_hash) VALUES($1,$2,$3,$4,$5)',[uid(),email,'MADAR Administrator','admin',await hashPassword(password)])}
  }
- if(await one(db,'SELECT id FROM profiles LIMIT 1')){await db.tx(async tx=>{if(demo&&await enrichDemo(tx))await releaseAll(tx,'Additional demo content');for(const p of await rows(tx,'SELECT id FROM profiles ORDER BY id')){
+ if(await one(db,'SELECT id FROM profiles LIMIT 1')){await db.tx(async tx=>{await addNewProfileTypes(tx);if(demo&&await enrichDemo(tx))await releaseAll(tx,'Additional demo content');for(const p of await rows(tx,'SELECT id FROM profiles ORDER BY id')){
    // Pages added in later versions (for example Help Desk and Daily Tasks) get their default layout.
    for(const [page,l] of Object.entries(catalog.defaults)){const added=await tx.query('INSERT INTO layouts(page_key,profile_id,draft,published,published_version) VALUES($1,$2,$3,$3,1) ON CONFLICT(page_key,profile_id) DO NOTHING RETURNING page_key',[page,p.id,JSON.stringify(l)]);if(added.rows.length)await tx.query('INSERT INTO layout_versions(page_key,profile_id,version,layout,published_by) VALUES($1,$2,1,$3,$4) ON CONFLICT DO NOTHING',[page,p.id,JSON.stringify(l),'upgrade'])}
    const latest=await one(tx,'SELECT bundle FROM releases WHERE profile_id=$1 ORDER BY version DESC LIMIT 1',[p.id]);if(latest?.bundle.experienceVersion!==6)await releaseProfile(tx,p.id,'Upgrade published TV experience to v6 (four Info Hub tabs)')}});return;}
  await db.tx(async tx=>{
   for(const type of profileTypes){
-   const p={id:type,name:{public:'Public / Visitor',employee:'Employee',management:'Management',vip:'VIP Lounge',signage:'Dedicated Signage'}[type],description:{public:'Welcoming spaces and public information',employee:'Internal communication and learning',management:'Operations and executive information',vip:'Curated hospitality and premium media',signage:'Focused meeting and queue boards'}[type],profileType:type,theme:{accent:'#6b5837',mode:'light',language:'en',density:'comfortable'},allowedSections:['*']};
-   p.experience=experienceDefaults(p);
+   const p=defaultProfile(type);
    await tx.query('INSERT INTO profiles(id,payload) VALUES($1,$2)',[type,JSON.stringify(p)]);
    for(const [page,l] of Object.entries(catalog.defaults)){
     await tx.query('INSERT INTO layouts(page_key,profile_id,draft,published,published_version) VALUES($1,$2,$3,$3,1)',[page,type,JSON.stringify(l)]);

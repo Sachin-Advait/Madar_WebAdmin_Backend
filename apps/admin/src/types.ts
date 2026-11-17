@@ -1,4 +1,4 @@
-export type ProfileType = 'public'|'employee'|'management'|'vip'|'signage';
+export type ProfileType = 'public'|'employee'|'management'|'vip'|'signage'|'queue'|'meeting';
 export type Role = 'admin'|'editor'|'viewer';
 export type User = {id:string; email:string; name:string; role:Role};
 export type LayoutPosition = {x:number; y:number; w:number; h:number};

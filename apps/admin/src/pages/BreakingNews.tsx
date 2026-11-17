@@ -4,12 +4,13 @@ import {Download,Newspaper,Plus,Rss,Save,Send,Trash2} from 'lucide-react';
 import {request} from '../api';
 import type {Role} from '../types';
 import {Button,Card,Empty,ErrorBox,FormField,Loading,PageHeading,useFeedback} from '../components/Common';
+import {PROFILE_TYPES} from '../profileTypes';
 
 type Feed={id:string;url:string;name:string;createdAt:string;lastFetchedAt:string|null};
 type Fetched={url:string;source:string;items:{title:string;link:string;publishedAt:string|null}[]};
 type Headline={id:string;title:string;source:string;link:string;createdBy:string;createdAt:string;expiresAt:string|null};
 type Ticker={enabled:boolean;label:string;labelAr:string;speed:'slow'|'normal'|'fast';profiles:string[]};
-const profiles=[['public','Public / Visitor'],['employee','Employee'],['management','Management'],['vip','VIP Lounge'],['signage','Dedicated Signage']];
+const profiles=PROFILE_TYPES;
 const post=(url:string,body:unknown,method='POST')=>request(url,{method,body:JSON.stringify(body)});
 
 export default function BreakingNews({role}:{role:Role}){

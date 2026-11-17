@@ -15,7 +15,9 @@ export const sha=value=>crypto.createHash('sha256').update(value).digest('hex');
 export class Problem extends Error {constructor(status,message){super(message);this.status=status}}
 export const check=(ok,status,msg)=>{if(!ok)throw new Problem(status,msg)};
 export const roles={viewer:0,editor:1,admin:2};
-export const profileTypes=['public','employee','management','vip','signage'];
+export const profileTypes=['public','employee','management','vip','signage','queue','meeting'];
+/** Display names of the profile types, as the admin shows them. */
+export const profileTypeNames={public:'Public / Visitor',employee:'Employee',management:'Management',vip:'VIP Lounge',signage:'Dedicated Signage',queue:'Queue Management',meeting:'Meeting Management'};
 const scrypt=promisify(crypto.scrypt);
 export async function hashPassword(password){const salt=crypto.randomBytes(16).toString('hex');return salt+':'+(await scrypt(password,salt,64)).toString('hex')}
 export async function verifyPassword(password,stored){const [salt,hex]=stored.split(':');const computed=await scrypt(password,salt,64);return crypto.timingSafeEqual(computed,Buffer.from(hex,'hex'))}
