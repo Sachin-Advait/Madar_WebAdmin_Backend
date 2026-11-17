@@ -49,16 +49,25 @@ export function registerRemoteRoutes(app,{db,admin,wrap,limiter}){
   app.locals.remoteOnline??=async()=>false;
   const online=id=>app.locals.remoteOnline(id).catch(()=>false);
 
-  // TV (device key): new code for this screen; replaces the screen's last code.
-  app.post('/api/app/remote/code',wrap(async(req,res)=>{
-    let code='';
-    for(let i=0;i<8&&!code;i++){
-      const next=String(crypto.randomInt(0,1000000)).padStart(6,'0');
-      try{await db.query(`INSERT INTO remote_codes(screen_id,code_hash,expires_at) VALUES($1,$2,now()+interval '${CODE_SECONDS} seconds') ON CONFLICT(screen_id) DO UPDATE SET code_hash=EXCLUDED.code_hash,expires_at=EXCLUDED.expires_at`,[req.screen.id,codeHash(next)]);code=next}
+  // New code for a screen; replaces the screen's last code.
+  const newCode=async screenId=>{
+    for(let i=0;i<8;i++){
+      const code=String(crypto.randomInt(0,1000000)).padStart(6,'0');
+      try{await db.query(`INSERT INTO remote_codes(screen_id,code_hash,expires_at) VALUES($1,$2,now()+interval '${CODE_SECONDS} seconds') ON CONFLICT(screen_id) DO UPDATE SET code_hash=EXCLUDED.code_hash,expires_at=EXCLUDED.expires_at`,[screenId,codeHash(code)]);return {code,ttl:CODE_SECONDS,approvalRequired:remoteApprovalRequired()}}
       catch(e){if(e.code!=='23505')throw e}
     }
-    check(code,503,'Could not make a pairing code, try again');
-    res.status(201).json({code,ttl:CODE_SECONDS,approvalRequired:remoteApprovalRequired()});
+    check(false,503,'Could not make a pairing code, try again');
+  };
+  // TV (device key), e.g. the Menu key on the TV's own remote.
+  app.post('/api/app/remote/code',wrap(async(req,res)=>{res.status(201).json(await newCode(req.screen.id))}));
+  // Admin Studio: show a code on a chosen TV (and to the admin).
+  app.post('/api/admin/screens/:id/remote-code',admin('admin'),wrap(async(req,res)=>{
+    const s=await one(db,'SELECT id,enabled FROM screens WHERE id=$1',[req.params.id]);
+    check(s,404,'Screen not found');check(s.enabled,422,'That TV is disabled');
+    const c=await newCode(s.id);
+    await audit(db,req.user.email,'remote-code','screen',s.id,{});
+    events.emit('remote',{kind:'code',screenId:s.id,code:c.code,ttl:c.ttl});
+    res.status(201).json({...c,tvOnline:await online(s.id)});
   }));
 
   // TV: phones paired with this screen (shown in the TV's remote settings).
@@ -186,6 +195,7 @@ export function attachRemote({io,db,events,app,logger}){
     try{
       if(e.pairingId)await sendStatus(e.pairingId);
       if(e.kind==='paired')tvs.to(e.screenId).emit('remote-paired',{approvalPending:e.approvalPending,label:e.label});
+      if(e.kind==='code')tvs.to(e.screenId).emit('remote-code',{code:e.code,ttl:e.ttl});
     }catch(err){logger?.warn({message:err.message},'Remote status update failed')}
   });
   // TVs going on or offline: tell their phones.

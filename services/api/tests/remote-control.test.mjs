@@ -96,6 +96,15 @@ test('a TV that is off reports unavailable; rejecting and unpairing end the pair
     const {body:after}=await request(app).get('/api/remote/session').set('Authorization','Bearer '+direct.token).expect(200);
     assert.deepEqual([after.status,after.reason],['ended','unpaired']);
   }finally{delete process.env.MADAR_REMOTE_APPROVAL}
+  const tv=open('/',{deviceKey:device});await once(tv,'connect');
+  const shown=once(tv,'remote-code');
+  const {body:fromAdmin}=await admin.post('/api/admin/screens/demo-screen-1/remote-code').set('X-Madar-Request','1').send({}).expect(201);
+  assert.equal(fromAdmin.tvOnline,true);
+  assert.deepEqual(await shown,{code:fromAdmin.code,ttl:120});
+  const {body:viaAdmin}=await pair(fromAdmin.code,'Admin code phone').expect(201);
+  assert.equal(viaAdmin.status,'pending');
+  await admin.post('/api/admin/screens/missing/remote-code').set('X-Madar-Request','1').send({}).expect(404);
+  tv.close();
   await request(app).post('/api/app/remote/code').send({}).expect(401);
   await request(app).get('/api/admin/remote-pairings').expect(401);
 });

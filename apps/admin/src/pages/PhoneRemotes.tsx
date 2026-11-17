@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Gamepad2, Smartphone, X, XCircle } from "lucide-react";
-import { request } from "../api";
+import { Check, Gamepad2, KeyRound, Smartphone, X, XCircle } from "lucide-react";
+import { API, request } from "../api";
 import type { Role } from "../types";
 import {
   Button,
@@ -53,6 +53,38 @@ export default function PhoneRemotes({ role }: { role: Role }) {
   });
   const [busy, setBusy] = useState("");
   const canDecide = role === "admin";
+  const { data: screens = [] } = useQuery({
+    queryKey: ["screens"],
+    queryFn: API.screens,
+  });
+  const [screenId, setScreenId] = useState("");
+  const [shown, setShown] = useState<{
+    code: string;
+    tv: string;
+    until: number;
+    tvOnline: boolean;
+  } | null>(null);
+  async function showCode() {
+    const target = screens.find((s) => s.id === screenId);
+    if (!target) return;
+    setBusy("code");
+    try {
+      const r = await request<{ code: string; ttl: number; tvOnline: boolean }>(
+        `/api/admin/screens/${target.id}/remote-code`,
+        { method: "POST", body: "{}" },
+      );
+      setShown({
+        code: r.code,
+        tv: target.name,
+        until: Date.now() + r.ttl * 1000,
+        tvOnline: r.tvOnline,
+      });
+    } catch (err) {
+      feedback.error(err);
+    } finally {
+      setBusy("");
+    }
+  }
   async function act(p: Pairing, action: "approve" | "reject" | "revoke") {
     if (
       action === "revoke" &&
@@ -194,7 +226,7 @@ export default function PhoneRemotes({ role }: { role: Role }) {
             ? "Approval is turned off (MADAR_REMOTE_APPROVAL=0): a correct TV code pairs a phone straight away."
             : "A phone can't control a TV until it is approved here."}{" "}
           Approved phones work for {data?.grantHours ?? 12} hours, then pair
-          again. On the TV: Settings → Phone remote → Show code.
+          again. Show a code below, or press Menu on the TV's own remote.
         </span>
       </div>
       {isLoading ? (
@@ -203,6 +235,53 @@ export default function PhoneRemotes({ role }: { role: Role }) {
         <ErrorBox error={error} />
       ) : (
         <>
+          <Card>
+            <div className="card-head">
+              <div>
+                <h3>
+                  <KeyRound size={16} /> Pairing code
+                </h3>
+                <p>
+                  Shows a 6-digit code on the TV for 2 minutes. Type it in the
+                  Control Centre app on the phone.
+                </p>
+              </div>
+            </div>
+            <div className="action-cell">
+              <select
+                aria-label="TV"
+                value={screenId}
+                onChange={(e) => setScreenId(e.target.value)}
+              >
+                <option value="">Choose a TV…</option>
+                {screens.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+              <Button
+                icon={KeyRound}
+                disabled={!canDecide || !screenId || !!busy}
+                loading={busy === "code"}
+                onClick={showCode}
+              >
+                Show code on TV
+              </Button>
+            </div>
+            {shown && shown.until > Date.now() && (
+              <p>
+                <strong style={{ fontSize: 28, letterSpacing: 6 }}>
+                  {shown.code.slice(0, 3)} {shown.code.slice(3)}
+                </strong>{" "}
+                for {shown.tv} until{" "}
+                {new Date(shown.until).toLocaleTimeString()}
+                {shown.tvOnline
+                  ? ""
+                  : " (the TV is offline, so it isn't showing the code)"}
+              </p>
+            )}
+          </Card>
           <Card>
             <div className="card-head">
               <div>
