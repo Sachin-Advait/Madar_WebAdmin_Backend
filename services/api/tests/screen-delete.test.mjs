@@ -17,6 +17,8 @@ test('admins delete a screen; its key stops working and its records go with it',
   await request(app).put('/api/app/favourites/videos/sample-videos-1').set('X-Screen-Key',key).expect(200);
   await db.query("INSERT INTO schedules(id,payload) VALUES('only-this-screen',$1)",[JSON.stringify({name:'Mornings',pageKey:'home',screenId:screen,daysOfWeek:[1],startTime:'08:00',endTime:'09:00',timeZone:'Asia/Muscat',priority:1,enabled:true})]);
   assert.ok((await one(db,'SELECT count(*)::int AS n FROM deliveries WHERE screen_id=$1',[screen])).n>0);
+  // The TV reported progress on a delivery (an acknowledgement row points at it).
+  await db.query("INSERT INTO acknowledgements(id,delivery_id,stage,digest) SELECT 'ack-1',id,'downloaded','x' FROM deliveries WHERE screen_id=$1 LIMIT 1",[screen]);
   await admin.delete('/api/admin/screens/'+screen).expect(403);// needs the CSRF header
   const {body}=await admin.delete('/api/admin/screens/'+screen).set('X-Madar-Request','1').expect(200);
   assert.deepEqual(body,{ok:true,schedules:1});
